@@ -1,0 +1,32 @@
+services:
+  - type: worker
+    name: aquamaster-bot
+    runtime: python
+    region: frankfurt
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python main.py
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.0
+      - key: TZ
+        value: Asia/Tashkent
+      - key: BOT_TOKEN
+        sync: false
+      - key: ADMIN_IDS
+        value: "5757712306"
+      - key: SUPER_ADMIN_IDS
+        value: "5757712306"
+      - key: AI_API_KEY
+        sync: false
+      - key: AI_API_URL
+        value: https://zenmux.ai/api/v1
+      - key: AI_MODEL
+        value: dots-studio/dots3-note-prev
+      - key: GOOGLE_API_KEY
+        sync: false
+      - key: GOOGLE_API_MODEL
+        value: gemini-3.8-flash
+      - key: DATABASE_URL
+        value: sqlite+aiosqlite:///app.db
