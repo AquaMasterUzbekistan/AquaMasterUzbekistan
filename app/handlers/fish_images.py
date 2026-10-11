@@ -248,7 +248,7 @@ async def handle_cmd_images(message: Message, state: FSMContext):
     )
 
 
-@router.message(FishImageSearchState.waiting_query)
+@router.message(FishImageSearchState.waiting_query, ~F.text.startswith("/"))
 async def process_fish_image_query(message: Message, state: FSMContext):
     """Process fish name input and return strictly verified images."""
     user_id = message.from_user.id if message.from_user else 0
@@ -260,6 +260,9 @@ async def process_fish_image_query(message: Message, state: FSMContext):
             reply_markup=image_search_back_keyboard(),
         )
         return
+
+    # Clear image search waiting state now that query is submitted
+    await state.clear()
 
     # Prevent concurrent flooding from same user
     if user_id in _active_user_requests:

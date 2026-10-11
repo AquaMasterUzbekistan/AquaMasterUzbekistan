@@ -147,6 +147,87 @@ class TestAdminStats(unittest.IsolatedAsyncioTestCase):
             self.assertIn("Surat izlash so'rovlari", formatted)
             self.assertIn("To'liq ma'lumot (dosye) ko'rishlar", formatted)
 
+    def test_admin_router_priority_over_image_search(self):
+        """Verify that admin_router is prioritized before fish_images_router and search_router."""
+        from app.handlers import all_routers
+        from app.handlers.admin import admin_router
+        from app.handlers.fish_images import router as fish_images_router
+        from app.handlers.search import router as search_router
+
+        self.assertIn(admin_router, all_routers)
+        self.assertIn(fish_images_router, all_routers)
+        self.assertIn(search_router, all_routers)
+
+        admin_idx = all_routers.index(admin_router)
+        fish_images_idx = all_routers.index(fish_images_router)
+        search_idx = all_routers.index(search_router)
+
+        self.assertLess(
+            admin_idx,
+            fish_images_idx,
+            "admin_router must precede fish_images_router so /admin_stats is not intercepted by image search",
+        )
+        self.assertLess(
+            admin_idx,
+            search_idx,
+            "admin_router must precede search_router so /admin_stats is not intercepted by text search",
+        )
+
+    async def test_cmd_admin_stats_clears_state_and_provides_keyboard(self):
+        """Verify cmd_admin_stats clears any active FSM state and delivers stats with admin keyboard."""
+        from app.handlers.admin.admin_handlers import cmd_admin_stats
+
+        mock_state = AsyncMock()
+        mock_user = MagicMock()
+        admin_id = settings.ADMIN_IDS[0] if settings.ADMIN_IDS else 12345
+        mock_user.id = admin_id
+        mock_user.username = "admin_tester"
+
+        mock_message = AsyncMock()
+        mock_message.from_user = mock_user
+
+        # Temporarily ensure admin_id is authorized
+        original_admin_ids = list(settings.ADMIN_IDS)
+        try:
+            if admin_id not in settings.ADMIN_IDS:
+                settings.ADMIN_IDS.append(admin_id)
+
+            await cmd_admin_stats(mock_message, state=mock_state)
+
+            # Verify state was explicitly cleared
+            mock_state.clear.assert_awaited_once()
+
+            # Verify response was sent with keyboard
+            mock_message.answer.assert_awaited_once()
+            call_args = mock_message.answer.call_args
+            response_text = call_args[0][0] if call_args[0] else call_args[1].get("text", "")
+            reply_markup = call_args[1].get("reply_markup")
+
+            self.assertIn("FOYDALANUVCHILAR STATISTIKASI", response_text)
+            self.assertIsNotNone(reply_markup)
+
+            # Check buttons in markup
+            callbacks = [btn.callback_data for row in reply_markup.inline_keyboard for btn in row]
+            self.assertIn("admin:stats", callbacks)
+            self.assertIn("admin_panel", callbacks)
+            self.assertIn("home", callbacks)
+        finally:
+            settings.ADMIN_IDS = original_admin_ids
+
+    async def test_cmd_admin_stats_unauthorized(self):
+        """Verify non-admin user is rejected with ERROR_ADMIN_ONLY."""
+        from app.handlers.admin.admin_handlers import cmd_admin_stats
+
+        mock_state = AsyncMock()
+        mock_user = MagicMock()
+        mock_user.id = 999999999999
+        mock_message = AsyncMock()
+        mock_message.from_user = mock_user
+
+        await cmd_admin_stats(mock_message, state=mock_state)
+        mock_state.clear.assert_awaited_once()
+        mock_message.answer.assert_awaited_once_with(uz.ERROR_ADMIN_ONLY)
+
 
 if __name__ == "__main__":
     unittest.main()

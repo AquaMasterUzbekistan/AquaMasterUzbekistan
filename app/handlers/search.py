@@ -215,7 +215,7 @@ async def process_search_photo_disabled(message: Message, state: FSMContext):
     )
 
 
-@router.message(SearchState.waiting_query, F.text)
+@router.message(SearchState.waiting_query, F.text, ~F.text.startswith("/"))
 async def process_search_text(message: Message, state: FSMContext):
     """Search fish by text query in local DB and AI."""
     query = message.text.strip()

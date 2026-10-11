@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 from sqlalchemy import select, func, or_
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.repositories.base import BaseRepository
@@ -28,14 +29,20 @@ class UserRepository(BaseRepository[User]):
         user = await self.get_by_telegram_id(telegram_id)
         now_dt = datetime.now(timezone.utc)
         if user is None:
-            user = await self.create(
-                telegram_id=telegram_id,
-                username=username,
-                first_name=first_name,
-                last_name=last_name,
-                language_code=language_code,
-                last_active_at=now_dt,
-            )
+            try:
+                user = await self.create(
+                    telegram_id=telegram_id,
+                    username=username,
+                    first_name=first_name,
+                    last_name=last_name,
+                    language_code=language_code,
+                    last_active_at=now_dt,
+                )
+            except IntegrityError:
+                await self.session.rollback()
+                user = await self.get_by_telegram_id(telegram_id)
+                if user is None:
+                    raise
         else:
             needs_update = False
             if (

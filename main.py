@@ -29,6 +29,18 @@ import app.models  # noqa: F401 — ensure all models are imported for metadata 
 
 def setup_logging() -> logging.Logger:
     """Configure console and rotating/file logging."""
+    if sys.platform == "win32":
+        if sys.stdout and hasattr(sys.stdout, "reconfigure"):
+            try:
+                sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+            except Exception:
+                pass
+        if sys.stderr and hasattr(sys.stderr, "reconfigure"):
+            try:
+                sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+            except Exception:
+                pass
+
     log_file_path = Path(settings.LOG_FILE)
     log_file_path.parent.mkdir(parents=True, exist_ok=True)
 

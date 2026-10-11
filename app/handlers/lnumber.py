@@ -194,7 +194,7 @@ async def lnumber_search_prompt(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
 
 
-@router.message(LNumberSearchState.waiting_query, F.text)
+@router.message(LNumberSearchState.waiting_query, F.text, ~F.text.startswith("/"))
 async def lnumber_search_process(message: Message, state: FSMContext):
     query = message.text.strip()
     await state.clear()

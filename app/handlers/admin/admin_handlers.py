@@ -39,8 +39,11 @@ async def _check_admin(callback: CallbackQuery) -> bool:
 
 @router.message(Command("admin_stats"))
 @router.message(F.text == "/admin_stats")
-async def cmd_admin_stats(message: Message):
+async def cmd_admin_stats(message: Message, state: FSMContext | None = None):
     """Admin-only user statistics dashboard."""
+    if state:
+        await state.clear()
+
     user_id = message.from_user.id if message.from_user else 0
 
     async with async_session() as session:
@@ -57,12 +60,22 @@ async def cmd_admin_stats(message: Message):
         stats = await stats_svc.get_user_statistics()
         text = StatsService.format_admin_stats_message(stats)
 
-        await message.answer(text, parse_mode="HTML")
+        from aiogram.utils.keyboard import InlineKeyboardBuilder
+        from aiogram.types import InlineKeyboardButton
+        builder = InlineKeyboardBuilder()
+        builder.row(InlineKeyboardButton(text="🔄 Yangilash", callback_data="admin:stats"))
+        builder.row(InlineKeyboardButton(text="🔧 Admin panel", callback_data="admin_panel"))
+        builder.row(InlineKeyboardButton(text="🏠 Bosh menyu", callback_data="home"))
+
+        await message.answer(text, reply_markup=builder.as_markup(), parse_mode="HTML")
 
 
 @router.callback_query(F.data == "admin:stats")
-async def admin_stats_callback(callback: CallbackQuery):
+async def admin_stats_callback(callback: CallbackQuery, state: FSMContext | None = None):
     """Callback for admin stats from admin menu."""
+    if state:
+        await state.clear()
+
     if not await _check_admin(callback):
         return
 
@@ -77,14 +90,18 @@ async def admin_stats_callback(callback: CallbackQuery):
     builder = InlineKeyboardBuilder()
     builder.row(InlineKeyboardButton(text="🔄 Yangilash", callback_data="admin:stats"))
     builder.row(InlineKeyboardButton(text="🔧 Admin panel", callback_data="admin_panel"))
-    builder.row(*back_home_row())
+    builder.row(InlineKeyboardButton(text="🏠 Bosh menyu", callback_data="home"))
 
     await callback.message.edit_text(text, reply_markup=builder.as_markup(), parse_mode="HTML")
     await callback.answer()
 
 
+@router.message(Command("admin"))
 @router.message(F.text == "/admin")
-async def admin_command(message: Message):
+async def admin_command(message: Message, state: FSMContext | None = None):
+    if state:
+        await state.clear()
+
     user_id = message.from_user.id if message.from_user else 0
     if not is_admin(user_id):
         async with async_session() as session:
@@ -97,8 +114,11 @@ async def admin_command(message: Message):
     await message.answer(uz.ADMIN_PANEL, reply_markup=admin_menu_keyboard(), parse_mode="HTML")
 
 
+@router.message(Command("audit"))
 @router.message(F.text == "/audit")
-async def audit_command(message: Message):
+async def audit_command(message: Message, state: FSMContext | None = None):
+    if state:
+        await state.clear()
     async with async_session() as session:
         user_repo = UserRepository(session)
         db_user = await user_repo.get_by_telegram_id(message.from_user.id)

@@ -296,7 +296,7 @@ async def synonym_search_prompt(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
 
 
-@router.message(SynonymSearchState.waiting_query, F.text)
+@router.message(SynonymSearchState.waiting_query, F.text, ~F.text.startswith("/"))
 async def synonym_search_execute(message: Message, state: FSMContext):
     query = message.text.strip()
     await state.clear()

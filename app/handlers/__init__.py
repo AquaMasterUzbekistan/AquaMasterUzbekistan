@@ -23,6 +23,7 @@ from app.handlers.admin import admin_router
 
 all_routers = [
     start_router,
+    admin_router,
     taxonomy_router,
     lnumber_router,
     african_router,
@@ -44,5 +45,4 @@ all_routers = [
     about_router,
     favorites_router,
     reports_router,
-    admin_router,
 ]

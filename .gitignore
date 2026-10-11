@@ -40,7 +40,10 @@ venv.bak/
 *.sqlite
 *.sqlite3
 *.db
+*.db-shm
+*.db-wal
 app.db
+app.db*
 
 # Logs
 logs/
