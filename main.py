@@ -75,14 +75,13 @@ logger = setup_logging()
 async def set_bot_commands(bot: Bot) -> None:
     """Register standard commands in Telegram UI command menu."""
     commands = [
-        BotCommand(command="start", description="🏠 Asosiy menyuni ochish"),
-        BotCommand(command="search", description="🔍 Baliq turini qidirish"),
-        BotCommand(command="images", description="🔎 Baliq suratlarini qidirish"),
+        BotCommand(command="start", description="🏠 Asosiy menyu"),
+        BotCommand(command="search", description="🐠 Baliq qidirish"),
+        BotCommand(command="knowledge", description="📚 Akvarium bilimlari"),
         BotCommand(command="calc", description="🧮 Akvarium kalkulyatorlari"),
-        BotCommand(command="my_aquarium", description="🏠 Mening akvariumlarim"),
-        BotCommand(command="help", description="ℹ️ Yordam va qo'llanma"),
-        BotCommand(command="admin", description="🔧 Boshqaruv paneli (adminlar uchun)"),
-        BotCommand(command="admin_stats", description="📊 Statistika (adminlar uchun)"),
+        BotCommand(command="glossary", description="📖 Atamalar lug‘ati"),
+        BotCommand(command="about", description="ℹ️ Bot haqida va taklif"),
+        BotCommand(command="admin", description="🔧 Admin boshqaruvi"),
     ]
     try:
         await bot.set_my_commands(commands, scope=BotCommandScopeDefault())
@@ -222,6 +221,11 @@ async def main() -> None:
 
     logger.info("Starting polling...")
     try:
+        try:
+            await bot.delete_webhook(drop_pending_updates=True)
+        except Exception as e:
+            logger.warning("Could not reset webhook on startup (continuing): %s", e)
+
         await dp.start_polling(
             bot,
             allowed_updates=dp.resolve_used_update_types(),

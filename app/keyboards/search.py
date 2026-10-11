@@ -10,16 +10,16 @@ from app.keyboards.navigation import back_home_row
 
 
 def calculators_menu_keyboard() -> InlineKeyboardMarkup:
+    """Build keyboard for the 7 aquarium calculators."""
     builder = InlineKeyboardBuilder()
     buttons = [
-        (uz.CALC_VOLUME, "calc:volume"),
-        (uz.CALC_WATER_CHANGE, "calc:water_change"),
-        (uz.CALC_HEATER, "calc:heater"),
-        (uz.CALC_FILTER, "calc:filter"),
-        (uz.CALC_AIR_PUMP, "calc:air_pump"),
-        (uz.CALC_STOCKING, "calc:stocking"),
-        (uz.CALC_SALT, "calc:salt"),
-        (uz.CALC_FEEDING, "calc:feeding"),
+        ("📐 1. Akvarium hajmi (L × W × H)", "calc:volume"),
+        ("💧 2. Haqiqiy suv hajmi (Netto)", "calc:net_volume"),
+        ("🪣 3. Suv almashtirish hajmi (%)", "calc:water_change"),
+        ("🌀 4. Filtr aylanishi (Turnover)", "calc:filter"),
+        ("📅 5. Suv almashtirish jadvali", "calc:schedule"),
+        ("🍽️ 6. Ozuqa miqdori tavsiyasi", "calc:feeding"),
+        ("⚡ 7. Elektr energiyasi sarfi", "calc:power"),
     ]
     for text, data in buttons:
         builder.row(InlineKeyboardButton(text=text, callback_data=data))
@@ -113,19 +113,37 @@ def search_results_keyboard(
     filter_code: str = "",
 ) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
-    if query:
-        builder.row(InlineKeyboardButton(
-            text="🤖 AI chuqur tahlili (FishBase / SeriouslyFish)",
-            callback_data=f"ai_search:{query[:35]}"
-        ))
-    for sp in results:
-        builder.row(InlineKeyboardButton(
-            text=f"🐟 {sp.scientific_name}",
-            callback_data=f"profile:{sp.id}:summary"
-        ))
+    for item in results:
+        # Check if item is a unified dict, LNumberDesignation, or Species
+        if isinstance(item, dict):
+            if item["type"] == "lnumber":
+                cb = f"lnum:view:{item['id']}"
+                label = item["display_title"]
+            else:
+                cb = f"profile:{item['id']}:summary"
+                label = item["display_title"]
+                if item.get("subtitle"):
+                    label += f" ({item['subtitle']})"
+        elif hasattr(item, "designation"):
+            cb = f"lnum:view:{item.id}"
+            sci = item.scientific_name_current or "Undescribed"
+            label = f"🔢 {item.designation} — {sci}"
+        else:
+            cb = f"profile:{item.id}:summary"
+            sub = ""
+            if getattr(item, "trade_names", None) and item.trade_names:
+                sub = f" ({item.trade_names[0].name})"
+            elif getattr(item, "common_names", None) and item.common_names:
+                sub = f" ({item.common_names[0].name})"
+            label = f"🐠 {item.scientific_name}{sub}"
+
+        # Truncate label if too long for inline button
+        if len(label) > 42:
+            label = label[:40] + "…"
+        builder.row(InlineKeyboardButton(text=label, callback_data=cb))
+
     if total_pages > 1:
         nav = []
-        # Encode pagination callback: "spg:page:flt_code" or "spg:page:q:query"
         tag = f"f_{filter_code}" if filter_code else f"q_{query[:20]}"
         if page > 1:
             nav.append(InlineKeyboardButton(text=uz.NAV_PREV, callback_data=f"spg:{page - 1}:{tag}"))
@@ -137,7 +155,7 @@ def search_results_keyboard(
     if filter_code:
         builder.row(InlineKeyboardButton(text="⚙️ Boshqa filtr tanlash", callback_data="search:filters"))
     else:
-        builder.row(InlineKeyboardButton(text="🔎 Yangi matnli qidiruv", callback_data="search"))
+        builder.row(InlineKeyboardButton(text="🔎 Yangi qidiruv", callback_data="search"))
 
     builder.row(*back_home_row())
     return builder.as_markup()

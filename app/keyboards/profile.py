@@ -24,8 +24,7 @@ def profile_tabs_keyboard(
         ))
 
     tabs = [
-        (uz.PROFILE_FULL_POST, f"profile:{species_id}:full_post"),
-        (uz.PROFILE_FIND_IMAGES, f"fish_images:fetch:{species_id}"),
+        ("📋 Standart ma'lumotnoma (A-H)", f"profile:{species_id}:summary"),
         (uz.PROFILE_INFO, f"profile:{species_id}:info"),
         (uz.PROFILE_WATER, f"profile:{species_id}:water"),
         (uz.PROFILE_DIET, f"profile:{species_id}:diet"),
@@ -34,7 +33,7 @@ def profile_tabs_keyboard(
         (uz.PROFILE_GENETICS, f"profile:{species_id}:genetics"),
         (uz.PROFILE_LOCALITY, f"profile:{species_id}:locality"),
         (uz.PROFILE_SOURCES, f"profile:{species_id}:sources"),
-        (uz.PROFILE_COMPARE, f"compare:select:{species_id}"),
+        (uz.PROFILE_FIND_IMAGES, f"fish_images:fetch:{species_id}"),
         (uz.PROFILE_REPORT, f"report:{species_id}"),
     ]
     for text, data in tabs:
@@ -50,5 +49,6 @@ def profile_tabs_keyboard(
             text=uz.PROFILE_FAVORITE, callback_data=f"fav:{species_id}"
         ))
 
+    builder.row(InlineKeyboardButton(text="🔎 Yangi qidiruv", callback_data="search"))
     builder.row(*back_home_row())
     return builder.as_markup()

@@ -421,6 +421,29 @@ class FishImageSearchService:
                 search_tiers=ordered_tiers,
             )
 
+        # Unified search: resolves fuzzy names, common names, trade names, typos (frontoza, ansictrus, etc.)
+        try:
+            from app.services.search_service import SearchService
+            search_svc = SearchService(session)
+            unified_matches = await search_svc.search_unified(clean, limit=1)
+            if unified_matches:
+                matched = unified_matches[0]
+                sci_name = matched.get("scientific_name", "")
+                if sci_name and sci_name != "Undescribed sp.":
+                    parts = sci_name.split()
+                    gen = parts[0].capitalize()
+                    sp_name = parts[1] if len(parts) > 1 else "sp."
+                    return FishNameComponents(
+                        raw_query=clean,
+                        genus=gen,
+                        species=sp_name,
+                        variant=None,
+                        canonical_name=sci_name,
+                        search_tiers=[sci_name, gen],
+                    )
+        except Exception as e:
+            logger.warning(f"Unified search resolution in image service failed: {e}")
+
         # If no Latin genus identified in first word, check local DB for exact or close species match
         records = await cls.get_all_species_records(session)
         for cand_name, sname, gen in records:

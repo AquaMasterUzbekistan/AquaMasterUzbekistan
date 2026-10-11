@@ -17,15 +17,15 @@ from app.services.image_search_service import (
 )
 
 
-def test_main_menu_has_image_search_button():
-    """Verify that '🔎 Baliq suratlarini qidirish' button is in main menu."""
+def test_main_menu_has_unified_search_button():
+    """Verify that '🐠 Baliq qidirish' unified search button is in main menu."""
     kb = main_menu_keyboard()
     callbacks = [btn.callback_data for row in kb.inline_keyboard for btn in row]
     texts = [btn.text for row in kb.inline_keyboard for btn in row]
 
-    assert "search_images" in callbacks
-    assert uz.MENU_SEARCH_IMAGES in texts
-    assert "🔎 Baliq suratlarini qidirish" in texts
+    assert "search" in callbacks
+    assert uz.MENU_PANEL_SEARCH in texts
+    assert "🐠 Baliq qidirish" in texts
 
 
 def test_fish_images_router_registered():

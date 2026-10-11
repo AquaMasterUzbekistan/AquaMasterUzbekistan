@@ -20,9 +20,13 @@ from app.handlers.remaining import (
 from app.handlers.lnumber import router as lnumber_router
 from app.handlers.taxonomy import router as taxonomy_router
 from app.handlers.admin import admin_router
+from app.handlers.knowledge import router as knowledge_router
+from app.handlers.about_suggest import router as about_suggest_router
 
 all_routers = [
     start_router,
+    knowledge_router,
+    about_suggest_router,
     admin_router,
     taxonomy_router,
     lnumber_router,

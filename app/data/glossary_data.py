@@ -1,0 +1,192 @@
+"""Aquarium Glossary Data — Comprehensive terms from Master Prompt Section 10."""
+
+from __future__ import annotations
+
+GLOSSARY_TERMS = [
+    {
+        "term": "F0 (Wild-Caught)",
+        "definition_uz": "Yovvoyi tabiatdan (ko'l yoki daryodan) to'g'ridan-to'g'ri tutilgan nasldor baliq. Genetik jihatdan 100% toza hisoblanadi. Tashqi ko'rinishga qarab F0 ekanligini qat'iy tasdiqlab bo'lmaydi, faqat rasmiy eksport va naslchilik hujjatlari bilan tasdiqlanadi.",
+        "definition_en": "Wild-caught parent fish taken directly from their natural habitat.",
+        "category": "Genetika va Naslchilik",
+    },
+    {
+        "term": "F1",
+        "definition_uz": "Ikki dona F0 (yovvoyi tutilgan) ota-onadan akvariumda olingan birinchi avlod. F1 baliqlar yovvoyi tabiat xususiyatlari, ranglari va anatomiyasini juda kuchli saqlab qoladi.",
+        "definition_en": "First filial generation — direct offspring of two wild-caught (F0) parents.",
+        "category": "Genetika va Naslchilik",
+    },
+    {
+        "term": "F2 (va keyingi avlodlar)",
+        "definition_uz": "F1 juftliklarning avlodi (ikkinchi avlod). Avlodlar (F3, F4...) uzoqlashgani sari inbriding (yaqin qarindoshlik chatishuvi) tufayli baliqlar rangi xiralashishi va immuniteti pasayishi mumkin.",
+        "definition_en": "Second filial generation — offspring of two F1 parents.",
+        "category": "Genetika va Naslchilik",
+    },
+    {
+        "term": "Pure line (Sof nasl)",
+        "definition_uz": "Boshqa turlar yoki begona lokalitetlar bilan chatishtirilmagan, sof genetik chiziqqa ega baliqlar guruhi. Akvariumchilikda sof naslni saqlash asosiy vazifadir.",
+        "definition_en": "A population of genetically uniform individuals uncrossed with outside lines.",
+        "category": "Genetika va Naslchilik",
+    },
+    {
+        "term": "Gibrid (Hybrid)",
+        "definition_uz": "Ikki xil tur yoki har xil jins vakillarining sun'iy yoki tasodifiy chatishmasidan paydo bo'lgan baliq (masalan, Flowerhorn, Blood Parrot, OB Peacock). Gibridlar ilmiy tur hisoblanmaydi.",
+        "definition_en": "Offspring resulting from interbreeding between two different species.",
+        "category": "Genetika va Naslchilik",
+    },
+    {
+        "term": "OB (Orange Blotch)",
+        "definition_uz": "Apelsinrang/olovrang fonda to'q qora dog'lari bo'lgan o'ziga xos rang morfi. Malavi ko'lida tabiiy urg'ochilarda uchraydi; zamonaviy seleksiyada OB Peacocks erkaklarida ham ko'paytirilgan.",
+        "definition_en": "Orange Blotch — a distinct mottled colour morph common in female Mbuna.",
+        "category": "Rang shakllari",
+    },
+    {
+        "term": "MC (Marmalade Cat)",
+        "definition_uz": "Malavi va Tanganika cichlidlaridagi och oq, sariq va pushti fon ustiga marmar kabi tarqalgan to'q dog'li rang varianti.",
+        "definition_en": "Marmalade Cat — a calico-like color variant featuring irregular blotches.",
+        "category": "Rang shakllari",
+    },
+    {
+        "term": "Albino (Albinizm)",
+        "definition_uz": "Melanin qora pigmentining genetik yo'qligi natijasida paydo bo'ladigan oq/sariq tana va qizil ko'zli baliqlar morfi. Albinoslarda ko'z rangining qizilligi asosiy belgidir.",
+        "definition_en": "Genetic absence of dark pigmentation resulting in pale body and red eyes.",
+        "category": "Rang shakllari",
+    },
+    {
+        "term": "Mbuna",
+        "definition_uz": "Malavi ko'lining qoyali sohillarida yashovchi, qat'iy hududiy va aksariyati o'txo'r (aufwuchs suvo'tlarini yeyuvchi) cichlidlar guruhi (Pseudotropheus, Labidochromis, Melanochromis, Tropheops va boshqalar).",
+        "definition_en": "Tonga native word meaning 'rockfish' — rock-dwelling Malawian cichlids.",
+        "category": "Taksonomiya",
+    },
+    {
+        "term": "Hap (Haplochromines)",
+        "definition_uz": "Malavi va Viktoriya ko'llaridagi ochiq suv havzalarida va qumli zonalarda yashovchi, odatda yirikroq, birmuncha tinchroq va yirtqich/hammaxo'r cichlidlar guruhi (Placidochromis, Protomelas, Sciaenochromis).",
+        "definition_en": "Haplochromine cichlids typically inhabiting open waters or sandy biotope.",
+        "category": "Taksonomiya",
+    },
+    {
+        "term": "Utaka",
+        "definition_uz": "Malavi ko'lining ochiq suv qatlamida to'dalanib yashovchi va zooplankton bilan oziqlanuvchi maxsus cichlidlar (Copadichromis, Mchenga avlodlari).",
+        "definition_en": "Open-water plankton-feeding Malawian cichlids forming midwater shoals.",
+        "category": "Taksonomiya",
+    },
+    {
+        "term": "Peacock (Aulonocara)",
+        "definition_uz": "Malavi ko'lining qumli va oraliq biotopida yashovchi, erkaklari tovus qushi kabi kamalakrang jilolarga ega bo'lgan mashhur Aulonocara avlodi vakillari. Boshida sezgir sensor teshiklari bor.",
+        "definition_en": "Peacock cichlids of the genus Aulonocara known for brilliant coloration.",
+        "category": "Taksonomiya",
+    },
+    {
+        "term": "Wild-caught (WC)",
+        "definition_uz": "Yovvoyi tabiatdan maxsus ruxsatnoma bilan ovlangan baliq. Sun'iy yetishtirilganlarga qaraganda yangi parametr va ozuqaga moslashishi qiyinroq kechadi.",
+        "definition_en": "Fish collected directly from natural freshwater bodies in the wild.",
+        "category": "Kelib chiqishi",
+    },
+    {
+        "term": "Tank-bred (TB)",
+        "definition_uz": "Akvarium yoki naslchilik fermalarida bir necha avlod davomida ko'paytirilgan baliqlar. Akvarium sharoitiga, tayyor granulalarga va odamga ancha oson moslashadi.",
+        "definition_en": "Captive-bred fish raised across generations in home aquaria or hatcheries.",
+        "category": "Kelib chiqishi",
+    },
+    {
+        "term": "Locality (Geografik lokalitet)",
+        "definition_uz": "Bir turning ko'l yoki daryoning aynan qaysi oroli, burni yoki qoyasida yashashi (masalan: Placidochromis phenochilus 'Mdoka', Aulonocara stuartgranti 'Chilumba Rocks'). Har bir lokalitet rangi bilan ajralib turadi.",
+        "definition_en": "Exact geographic collecting point of a specific wild population.",
+        "category": "Taksonomiya",
+    },
+    {
+        "term": "L-number va LDA-number",
+        "definition_uz": "Germaniyaning DATZ jurnali (L-raqam) va Das Aquarium (LDA-raqam) tomonidan Janubiy Amerika zirhli laqqalari (Loricariidae, Pleco) uchun beriladigan rasmiy bo'lmagan raqamli katalog (masalan, L046, L144, LDA033).",
+        "definition_en": "Aquarium identification numbering system for undescribed Loricariid catfishes.",
+        "category": "Taksonomiya",
+    },
+    {
+        "term": "pH (Vodorod ko'rsatkichi)",
+        "definition_uz": "Suvdagi vodorod ionlari kontsentratsiyasi. 7.0 — neytral, 7 dan past — kislotali, 7 dan yuqori — ishqoriy. Baliqlar uchun pH ning barqarorligi eng muhim omildir.",
+        "definition_en": "Potential of Hydrogen — logarithmic measure of acidity or alkalinity.",
+        "category": "Gidrokimyo",
+    },
+    {
+        "term": "GH (Umumiy qattiqlik)",
+        "definition_uz": "Suvdagi kaltsiy (Ca) va magniy (Mg) tuzlarining umumiy miqdori (nemis darajasida °dGH o'lchanadi). Baliqlarning suyak va osmoregulyatsiyasi uchun zarur.",
+        "definition_en": "General Hardness — concentration of divalent metal ions (Ca2+ and Mg2+).",
+        "category": "Gidrokimyo",
+    },
+    {
+        "term": "KH (Karbonat qattiqligi)",
+        "definition_uz": "Gidrokarbonat ionlari miqdori. KH suvning kislotalik buferi hisoblanib, pH keskin tushib ketishiga yo'l qo'ymaydi.",
+        "definition_en": "Carbonate Hardness — buffering capacity that stabilizes water pH.",
+        "category": "Gidrokimyo",
+    },
+    {
+        "term": "Ammiak (NH3)",
+        "definition_uz": "Baliq chiqindilari va ozuqa chirishidan hosil bo'ladigan o'ta zaharli gaz. Akvariumda xavfsiz darajasi: 0.00 mg/l. Ishqoriy suvda zaharliligi bir necha barobar oshadi.",
+        "definition_en": "Highly toxic nitrogenous waste compound excreted via fish gills.",
+        "category": "Gidrokimyo",
+    },
+    {
+        "term": "Nitrit (NO2)",
+        "definition_uz": "Ammiakning bakteriyalar tomonidan parchalanishidan hosil bo'ladigan zaharli oraliq mahsulot. Baliq qonida kislorod tashilishini to'xtatadi. Xavfsiz darajasi: 0.00 mg/l.",
+        "definition_en": "Toxic intermediate product of the biological nitrification cycle.",
+        "category": "Gidrokimyo",
+    },
+    {
+        "term": "Nitrat (NO3)",
+        "definition_uz": "Azot tsiklining yakuniy mahsuloti. Kam zaharli, ammo 30-50 mg/l dan oshsa baliqlar o'sishini to'xtatadi. Muntazam suv almashtirish orqali chiqariladi.",
+        "definition_en": "Final oxidized compound of the nitrogen cycle removed via water changes.",
+        "category": "Gidrokimyo",
+    },
+    {
+        "term": "Mexanik filtratsiya",
+        "definition_uz": "Suvdagi ko'rinadigan qattiq zarralar, suvo'tlar va najasni gubka yoki sintepon orqali jismoniy tutib qolish jarayoni.",
+        "definition_en": "Physical removal of suspended solid waste particles from aquarium water.",
+        "category": "Filtrlash",
+    },
+    {
+        "term": "Biologik filtratsiya",
+        "definition_uz": "G'ovakli keramik materiallarda yashovchi foydali nitrifikatsiyalovchi bakteriyalar yordamida ammiak va nitritni xavfsiz nitratga aylantirish jarayoni.",
+        "definition_en": "Conversion of toxic ammonia and nitrite into nitrate by bacterial colonies.",
+        "category": "Filtrlash",
+    },
+    {
+        "term": "Kimyoviy filtratsiya",
+        "definition_uz": "Faollashtirilgan ko'mir yoki maxsus smolalar yordamida suvdagi dorilar, ranglar, hidlar va og'ir metallarni yutib olish.",
+        "definition_en": "Adsorption of dissolved chemicals, medications, and pollutants using media.",
+        "category": "Filtrlash",
+    },
+    {
+        "term": "Karantin",
+        "definition_uz": "Yangi olingan yoki kasallangan baliqni umumiy akvariumdan alohida idishda 2–4 hafta davomida kuzatish va davolash chora-tadbiri.",
+        "definition_en": "Isolation period in a separate aquarium to prevent disease transmission.",
+        "category": "Salomatlik",
+    },
+    {
+        "term": "Inkubatsiya (Incubation)",
+        "definition_uz": "Urug'langan tuxumning rivojlanishi va undan lichinka chiqishigacha bo'lgan davr. Malavi og'izda saqlovchilarida odatda 21–25 kun davom etadi.",
+        "definition_en": "Developmental stage of fertilized eggs until larvae hatch.",
+        "category": "Ko'paytirish",
+    },
+    {
+        "term": "Fry (Chavoq)",
+        "definition_uz": "Tuxumdan yoki onasining og'zidan chiqqan, mustaqil suzish va oziqlanishni boshlagan eng yosh baliqchalar.",
+        "definition_en": "Free-swimming baby fish that have absorbed their yolk sac.",
+        "category": "Ko'paytirish",
+    },
+    {
+        "term": "Juvenile (Yosh baliq)",
+        "definition_uz": "Chavoqlik davridan o'tgan, ammo hali jinsiy balog'atga yetmagan o'smir baliq. Odatda kattalarga xos to'liq yorqin rangni hali olmagan bo'ladi.",
+        "definition_en": "Immature young fish that has not yet reached sexual maturity.",
+        "category": "Ko'paytirish",
+    },
+    {
+        "term": "Biotop (Biotope)",
+        "definition_uz": "Ma'lum bir tirik organizmlar guruhi uchun tabiiy yashash muhitini tashkil etuvchi aniq geografik va ekologik hudud (masalan, Malavi qoyali biotopi).",
+        "definition_en": "An area of uniform environmental conditions providing a living place for specific plants and animals.",
+        "category": "Yashash muhiti",
+    },
+    {
+        "term": "Endemik (Endemic)",
+        "definition_uz": "Faqat bitta aniq geografik hududda (masalan, faqat Malavi yoki Tanganika ko'lida) uchraydigan va dunyoning boshqa hech bir joyida tabiiy tarqalmagan tur.",
+        "definition_en": "Native and restricted to a certain place or geographic area.",
+        "category": "Biologiya",
+    },
+]

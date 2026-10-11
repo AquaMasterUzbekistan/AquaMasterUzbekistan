@@ -27,43 +27,41 @@ def test_author_sticker_configuration():
     assert settings.AUTHOR_STICKER_ID is None or isinstance(settings.AUTHOR_STICKER_ID, str)
 
 
-def test_main_menu_16_buttons():
-    """Verify that main menu has the exact 16 items specified in Section 10."""
+def test_main_menu_5_panels():
+    """Verify that main menu has the exact 5 primary panels specified in Section 4."""
     kb = main_menu_keyboard()
     button_texts = [btn.text for row in kb.inline_keyboard for btn in row]
     button_callbacks = [btn.callback_data for row in kb.inline_keyboard for btn in row]
 
     expected_texts = [
-        "🌍 Afrika baliqlari",
-        "🌎 Amerika baliqlari",
-        "🏞️ Ko‘llar va suv havzalari",
-        "🧬 Oilalar",
-        "🔬 Avlodlar",
-        "🐟 Barcha turlar",
-        "🐈 Catfish, Ancistrus va Pleco",
-        "🔢 L-number / LDA-number katalogi",
-        "🔎 Ilmiy nom bo‘yicha qidirish",
-        "📚 Sinonimlar va savdo nomlari",
-        "⚖️ Baliqlarni matnli taqqoslash",
-        "🧪 Akvarium kalkulyatorlari",
-        "📖 Lug‘at va ilmiy atamalar",
-        "📊 Ma’lumotlar bazasi qamrovi",
-        "ℹ️ Manbalar haqida",
-        "🏷️ Muallif",
+        "🐠 Baliq qidirish",
+        "📚 Akvarium bilimlari",
+        "🧮 Akvarium kalkulyatorlari",
+        "📖 Atamalar lug‘ati",
+        "ℹ️ Bot haqida va taklif yuborish",
     ]
 
     for expected in expected_texts:
         assert expected in button_texts, f"Missing expected menu button: {expected}"
 
     expected_callbacks = [
-        "african", "american", "locality_atlas", "families", "genera",
-        "all_species", "catfish_plecos", "lnumber_catalog", "search",
-        "synonyms_trades", "compare", "calculators", "dictionary",
-        "database_coverage", "sources_info", "author",
+        "search",
+        "knowledge_articles",
+        "calculators",
+        "dictionary",
+        "about_suggest",
     ]
 
     for cb in expected_callbacks:
         assert cb in button_callbacks, f"Missing expected callback: {cb}"
+
+    # Verify that the 8 legacy navigation menus have been removed from the main keyboard
+    removed_callbacks = [
+        "african", "american", "genera", "all_species",
+        "catfish_plecos", "lnumber_catalog", "compare"
+    ]
+    for removed in removed_callbacks:
+        assert removed not in button_callbacks, f"Removed callback {removed} should not be in main menu"
 
 
 @pytest.mark.asyncio

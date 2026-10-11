@@ -9,25 +9,14 @@ from app.localization import uz
 
 
 def main_menu_keyboard() -> InlineKeyboardMarkup:
+    """Build the clean 5-panel main navigation keyboard."""
     builder = InlineKeyboardBuilder()
     buttons = [
-        (uz.MENU_AFRICAN, "african"),
-        (uz.MENU_AMERICAN, "american"),
-        (uz.MENU_LOCALITY, "locality_atlas"),
-        (uz.MENU_FAMILIES, "families"),
-        (uz.MENU_GENERA, "genera"),
-        (uz.MENU_ALL_SPECIES, "all_species"),
-        (uz.MENU_CATFISH_PLECO, "catfish_plecos"),
-        (uz.MENU_LNUMBERS, "lnumber_catalog"),
-        (uz.MENU_SEARCH, "search"),
-        (uz.MENU_SEARCH_IMAGES, "search_images"),
-        (uz.MENU_SYNONYMS_TRADES, "synonyms_trades"),
-        (uz.MENU_COMPARE, "compare"),
-        (uz.MENU_CALCULATORS, "calculators"),
-        (uz.MENU_DICTIONARY, "dictionary"),
-        (uz.MENU_DB_COVERAGE, "database_coverage"),
-        (uz.MENU_SOURCES_INFO, "sources_info"),
-        (uz.MENU_AUTHOR, "author"),
+        (uz.MENU_PANEL_SEARCH, "search"),
+        (uz.MENU_PANEL_KNOWLEDGE, "knowledge_articles"),
+        (uz.MENU_PANEL_CALCULATORS, "calculators"),
+        (uz.MENU_PANEL_GLOSSARY, "dictionary"),
+        (uz.MENU_PANEL_ABOUT_SUGGEST, "about_suggest"),
     ]
     for text, data in buttons:
         builder.row(InlineKeyboardButton(text=text, callback_data=data))

@@ -9,28 +9,46 @@ BOT_WELCOME = (
     "Quyidagi bo'limlardan birini tanlang:"
 )
 
-# ── Main menu ───────────────────────────────────────────────────────
+# ── Main menu (5 Primary Panels) ──────────────────────────────────
+MENU_PANEL_SEARCH = "🐠 Baliq qidirish"
+MENU_PANEL_KNOWLEDGE = "📚 Akvarium bilimlari"
+MENU_PANEL_CALCULATORS = "🧮 Akvarium kalkulyatorlari"
+MENU_PANEL_GLOSSARY = "📖 Atamalar lug‘ati"
+MENU_PANEL_ABOUT_SUGGEST = "ℹ️ Bot haqida va taklif yuborish"
+
+# Standard Search messages
+SEARCH_PROMPT_MSG = (
+    "🐠 <b>Baliq nomini yozing.</b>\n\n"
+    "Ilmiy nomi, savdo nomi, mashhur nomi, qisqartmasi yoki nomining bir qismini yuborishingiz mumkin."
+)
+
+SEARCH_NOT_FOUND_MSG = (
+    "🔎 <b>Bu nom bo‘yicha aniq ma’lumot topilmadi.</b>\n\n"
+    "Nomni tekshirib qayta yuborishingiz yoki yangi tur qo‘shish uchun taklif qoldirishingiz mumkin."
+)
+
+# Legacy aliases preserved for internal compatibility
 MENU_AFRICAN = "🌍 Afrika baliqlari"
 MENU_AMERICAN = "🌎 Amerika baliqlari"
 MENU_DISCUS = "🐠 Diskuslar"
 MENU_OTHER_FISH = "🐟 Boshqa chuchuk suv baliqlari"
-MENU_SEARCH = "🔎 Ilmiy nom bo‘yicha qidirish"
+MENU_SEARCH = "🐠 Baliq qidirish"
 MENU_SEARCH_IMAGES = "🔎 Baliq suratlarini qidirish"
 MENU_COMPARE = "⚖️ Baliqlarni matnli taqqoslash"
 MENU_IDENTIFY = "📸 Baliqni aniqlash"
 MENU_GENETICS = "🧬 Genetika va seleksiya"
 MENU_LOCALITY = "🏞️ Ko‘llar va suv havzalari"
-MENU_CALCULATORS = "🧪 Akvarium kalkulyatorlari"
+MENU_CALCULATORS = "🧮 Akvarium kalkulyatorlari"
 MENU_MY_FISH = "❤️ Mening baliqlarim"
 MENU_BREEDING = "🥚 Ko'paytirish jurnali"
 MENU_HEALTH = "🩺 Baliqlar sog'lig'i"
-MENU_ARTICLES = "📚 Maqolalar"
-MENU_DICTIONARY = "📖 Lug‘at va ilmiy atamalar"
-MENU_ABOUT = "ℹ️ AquaMasterUzbekistan haqida"
+MENU_ARTICLES = "📚 Akvarium bilimlari"
+MENU_DICTIONARY = "📖 Atamalar lug‘ati"
+MENU_ABOUT = "ℹ️ Bot haqida va taklif yuborish"
 MENU_FAVORITES = "⭐ Saqlangan baliqlar"
 MENU_RECENT = "🕘 So'nggi ko'rilganlar"
 
-# Section 10 Master Menu items
+# Section 10 Master Menu items preserved internally
 MENU_FAMILIES = "🧬 Oilalar"
 MENU_GENERA = "🔬 Avlodlar"
 MENU_ALL_SPECIES = "🐟 Barcha turlar"

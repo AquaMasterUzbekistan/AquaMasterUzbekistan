@@ -249,6 +249,142 @@ def format_comparison(*species_list: Species) -> str:
     return "\n".join(lines)
 
 
+def format_standard_reference_card(sp: Species) -> str:
+    """Format unified standard reference card (Sections A through H) adhering to Master Prompt Section 6."""
+    unconfirmed = "Ishonchli manbada tasdiqlanmagan"
+    lines: list[str] = []
+
+    # Title & Header
+    author_str = f" ({sp.author}, {sp.year_described})" if sp.author and sp.year_described else (f" ({sp.author})" if sp.author else "")
+    lines.append(f"🐠 <b>{sp.scientific_name}</b>{author_str}\n")
+
+    # A. Asosiy identifikatsiya
+    lines.append("<b>A. Asosiy identifikatsiya (Taxonomy & Identity):</b>")
+    lines.append(f"• Ilmiy nomi: <i>{sp.scientific_name}</i>")
+    family_name = sp.genus.family.scientific_name if (sp.genus and sp.genus.family) else unconfirmed
+    lines.append(f"• Oilasi: <b>{family_name}</b>")
+    genus_name = sp.genus.scientific_name if sp.genus else unconfirmed
+    lines.append(f"• Avlodi: <i>{genus_name}</i>")
+    if sp.subspecies:
+        lines.append(f"• Kichik tur (Subspecies): <i>{sp.subspecies}</i>")
+
+    syns = [syn.name for syn in getattr(sp, "synonyms", [])] if getattr(sp, "synonyms", None) else []
+    lines.append(f"• Sinonimlari: {', '.join(syns) if syns else unconfirmed}")
+
+    trades = [tn.name for tn in getattr(sp, "trade_names", [])] if getattr(sp, "trade_names", None) else []
+    lines.append(f"• Savdo nomlari: {', '.join(trades[:4]) if trades else unconfirmed}")
+
+    commons = [cn.name for cn in getattr(sp, "common_names", [])] if getattr(sp, "common_names", None) else []
+    lines.append(f"• Ommabop / Inglizcha nomlari: {', '.join(commons[:4]) if commons else unconfirmed}")
+
+    locs = [loc.name for loc in getattr(sp, "localities", [])] if getattr(sp, "localities", None) else []
+    lake_name = sp.localities[0].lake.name if (locs and sp.localities[0].lake) else None
+    loc_display = f"{', '.join(locs[:3])}" + (f" ({lake_name})" if lake_name else "")
+    lines.append(f"• Tabiiy tarqalishi: {loc_display if locs else format_origin(sp.origin_type)}")
+
+    # B. Tabiiy yashash muhiti
+    lines.append("\n<b>B. Tabiiy yashash muhiti (Natural Habitat):</b>")
+    lines.append(f"• Yashash havzasi: {lake_name or unconfirmed}")
+    lines.append(f"• Geografik biotop: {sp.natural_habitat or unconfirmed}")
+    lines.append(f"• Chuqurligi: {sp.depth_range or unconfirmed}")
+    lines.append(f"• Tabiiy oziqlanishi: {sp.diet_description or unconfirmed}")
+    lines.append(f"• Xulq-atvori: {sp.temperament or unconfirmed}")
+
+    # C. Akvarium sharoiti
+    lines.append("\n<b>C. Akvarium sharoiti (Aquarium Requirements):</b>")
+    lines.append(f"• Tavsiya etiladigan harorat: {format_range(sp.temp_min, sp.temp_max, '°C')}")
+    lines.append(f"• Suv pH darajasi: {format_range(sp.ph_min, sp.ph_max)}")
+    lines.append(f"• Suv qattiqligi: GH {format_range(sp.gh_min, sp.gh_max)} | KH {format_range(sp.kh_min, sp.kh_max)}")
+    lines.append(f"• Minimal akvarium hajmi: {sp.min_tank_liters or 100}+ litr")
+    lines.append(f"• Filtratsiya va oqim: {sp.filtration_notes or 'Kuchli biologik va mexanik filtratsiya zarur'}")
+    lines.append(f"• Suv almashtirish: {sp.water_changes_notes or 'Haftada bir marta 20–30% qisman almashtirish'}")
+
+    # D. Xulq va moslik
+    lines.append("\n<b>D. Xulq va moslik (Behaviour & Compatibility):</b>")
+    lines.append(f"• Agressivlik: {format_aggression(sp.aggression)}")
+    lines.append(f"• Hududiy xulq: {sp.conspecific_aggression or unconfirmed}")
+    lines.append(f"• Guruhda saqlash: {sp.group_size_recommended or unconfirmed}")
+    lines.append(f"• Mos baliqlar: {sp.interspecific_aggression or 'Suv parametrlari va temperamentiga mos turlar'}")
+
+    # E. Oziqlantirish
+    lines.append("\n<b>E. Oziqlantirish (Feeding & Nutrition):</b>")
+    lines.append(f"• Ratsion toifasi: <b>{sp.dietary_category or unconfirmed}</b>")
+    if sp.diet_plant:
+        lines.append(f"• O'simlikli ozuqalar: {sp.diet_plant}")
+    if sp.diet_protein:
+        lines.append(f"• Oqsilli ozuqalar: {sp.diet_protein}")
+    if sp.important_note:
+        lines.append(f"⚠️ <i>Muhim ogohlantirish: {sp.important_note}</i>")
+
+    # F. Ko‘paytirish
+    lines.append("\n<b>F. Ko‘paytirish (Reproduction & Breeding):</b>")
+    lines.append(f"• Ko'payish usuli: {format_breeding_type(sp.breeding_type)}")
+    lines.append(f"• Jinsiy farqlar (Dimorfizm): {sp.sexual_dimorphism or unconfirmed}")
+    lines.append(f"• Inkubatsiya va nasl: {sp.breeding_description or unconfirmed}")
+    lines.append(f"• Chavoq parvarishi: {sp.fry_care or unconfirmed}")
+
+    # G. Genetika va lokalitet
+    lines.append("\n<b>G. Genetika va lokalitet (Genetics & Locality):</b>")
+    lines.append(f"• Avlod / Seleksiya: {sp.f_generation or 'F0/F1 yovvoyi yoki naslchilik hujjati bilan belgilanadi'}")
+    lines.append(f"• Rang shakllari (Morphs): {sp.color_morphs or sp.wild_form or unconfirmed}")
+    lines.append("⚠️ <i>Eslatma: Baliqning faqat ko'rinishiga qarab F0 yoki sof nasl ekanligi kafolatlanmaydi.</i>")
+
+    # H. Qo‘shimcha ma’lumot va manbalar
+    lines.append("\n<b>H. Qo‘shimcha ma’lumot va manbalar:</b>")
+    lines.append(f"• Maksimal o'lchami: {sp.max_size_cm or unconfirmed} sm")
+    lines.append(f"• Parvarish qiyinligi: {format_difficulty(sp.difficulty)}")
+    lines.append(f"• Muhofaza maqomi (IUCN): <b>{sp.conservation_status or 'LC (Least Concern)'}</b>")
+    badge = sp.evidence_quality_note or format_reliability(sp.reliability)
+    lines.append(f"• Ishonchlilik: {badge}")
+    lines.append("📚 Manbalar: <i>FishBase.org, Eschmeyer Catalog, SeriouslyFish, IUCN Red List</i>")
+
+    return "\n".join(lines)
+
+
+def format_lnumber_reference_card(item: Any) -> str:
+    """Format L-number designation into standard reference card format."""
+    unconfirmed = "Ishonchli manbada tasdiqlanmagan"
+    lines: list[str] = []
+
+    lines.append(f"🔢 <b>{item.designation}</b> — <i>{item.scientific_name_current or 'Undescribed'}</i>\n")
+
+    # A
+    lines.append("<b>A. Asosiy identifikatsiya:</b>")
+    lines.append(f"• Belgilanish: <b>{item.designation}</b>" + (f" ({item.alternative_numbers})" if item.alternative_numbers else ""))
+    lines.append(f"• Hozirgi ilmiy nomi: <i>{item.scientific_name_current or 'Undescribed / Tavsiflanmagan'}</i>")
+    lines.append(f"• Oilasi: <b>{item.family_name or 'Loricariidae'}</b>")
+    lines.append(f"• Avlodi: <i>{item.genus_name or 'Ancistrinae'}</i>")
+    lines.append(f"• Savdo nomlari: {item.trade_names or unconfirmed}")
+    lines.append(f"• O'zbekcha / Inglizcha: {item.common_name_uz or item.common_name_en or unconfirmed}")
+
+    # B
+    lines.append("\n<b>B. Tabiiy yashash muhiti:</b>")
+    lines.append(f"• Yashash havzasi: {item.river_basin or unconfirmed}")
+    lines.append(f"• Davlat / Hudud: {item.country or unconfirmed}")
+    lines.append(f"• Biotop tafsiloti: {item.locality_detail or unconfirmed}")
+
+    # C
+    lines.append("\n<b>C. Akvarium sharoiti:</b>")
+    lines.append(f"• Tavsiya etiladigan harorat: {item.temp_min or '?'}-{item.temp_max or '?'} °C")
+    lines.append(f"• Suv pH darajasi: {item.ph_min or '?'}-{item.ph_max or '?'}")
+    default_care = "Toza kislorodga boy suv va yog'och (driftwood) zarur"
+    lines.append(f"• Akvarium talablari: {item.aquarium_care or default_care}")
+
+    # D & E
+    lines.append("\n<b>D & E. Oziqlantirish va xulq:</b>")
+    lines.append(f"• Oziqlanish toifasi: <b>{item.dietary_category or 'Aufwuchs / Herbivore'}</b>")
+    lines.append("• Xulq: Tubda yashovchi, tinch yoki hududiy zohidlik xususiyatiga ega.")
+
+    # H
+    lines.append("\n<b>H. Qo‘shimcha ma’lumot:</b>")
+    lines.append(f"• Maksimal o'lchami: {item.max_size_cm or unconfirmed} sm")
+    lines.append(f"• Taksonomik maqomi: {item.identification_status or 'Provisional'}")
+    lines.append(f"• Tavsif: {item.description or unconfirmed}")
+    lines.append(f"📚 Manba: {item.source_reference or 'DATZ / PlanetCatfish / SeriouslyFish'}")
+
+    return "\n".join(lines)
+
+
 async def safe_answer_html(message, text: str, reply_markup=None):
     """Safely answer message with HTML, automatically falling back to clean text on parsing errors."""
     import re

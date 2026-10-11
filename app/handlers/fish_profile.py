@@ -50,8 +50,9 @@ async def fish_profile(callback: CallbackQuery):
         def _get_tabs_kb():
             return profile_tabs_keyboard(species_id, is_fav, genus_id, genus_name)
 
-        if tab == "summary":
-            text = format_fish_profile_summary(sp)
+        if tab in ("summary", "full_post"):
+            from app.utils.formatting import format_standard_reference_card
+            text = format_standard_reference_card(sp)
             kb = _get_tabs_kb()
         elif tab == "info":
             lines = [f"🔬 <b>ILMIY IDENTIFIKATSIYA VA TANA TUZILISHI</b>\n<i>{sp.scientific_name}</i>\n"]

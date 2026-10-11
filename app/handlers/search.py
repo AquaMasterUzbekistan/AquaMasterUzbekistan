@@ -33,21 +33,25 @@ class SearchState(StatesGroup):
 
 @router.callback_query(F.data == "search")
 async def search_prompt(callback: CallbackQuery, state: FSMContext):
-    prompt_text = (
-        "🔎 <b>BALIQLARNI ILMIY QIDIRISH (ATLAS & AI)</b>\n\n"
-        "Qidirilayotgan baliq nomini yozing:\n"
-        "• Ilmiy nomi: <i>Labidochromis caeruleus</i>, <i>Symphysodon discus</i>\n"
-        "• Ommabop / Xalq nomi: <i>Yellow lab</i>, <i>Skalyariya</i>, <i>Diskus</i>\n"
-        "• Savdo nomi: <i>Pigeon Blood</i>, <i>L046</i>, <i>Red Zebra</i>\n"
-        "• Jins yoki Oila: <i>Aulonocara</i>, <i>Apistogramma</i>, <i>Characidae</i>\n"
-        "• Lokatsiya yoki Havza: <i>Rio Negro</i>, <i>Xingu</i>, <i>Lake Malawi</i>\n\n"
-        "⚙️ Shuningdek, quyidagi tugma orqali <b>parametrlar bo'yicha filtrlash</b> mumkin:\n\n"
-        "📚 Barcha ma'lumotlar <b>FishBase.org, Eschmeyer, SeriouslyFish, IUCN Red List</b> "
-        "kabi xalqaro ilmiy manbalarga tayanadi."
+    """Show the prompt to enter fish name."""
+    await callback.message.edit_text(
+        uz.SEARCH_PROMPT_MSG,
+        reply_markup=search_main_keyboard(),
+        parse_mode="HTML"
     )
-    await callback.message.edit_text(prompt_text, reply_markup=search_main_keyboard(), parse_mode="HTML")
     await state.set_state(SearchState.waiting_query)
     await callback.answer()
+
+
+@router.message(F.text == "/search")
+async def cmd_search_prompt(message: Message, state: FSMContext):
+    """Command /search handler."""
+    await message.answer(
+        uz.SEARCH_PROMPT_MSG,
+        reply_markup=search_main_keyboard(),
+        parse_mode="HTML"
+    )
+    await state.set_state(SearchState.waiting_query)
 
 
 @router.callback_query(F.data == "search:filters")
@@ -65,24 +69,6 @@ async def search_filters_menu(callback: CallbackQuery, state: FSMContext):
         "• 🛡️ <b>Muhofaza maqomi:</b> IUCN CR, EN, VU, LC"
     )
     await callback.message.edit_text(text, reply_markup=filter_categories_keyboard(), parse_mode="HTML")
-    await callback.answer()
-
-
-@router.callback_query(F.data.startswith("flt:cat:"))
-async def search_filter_category_options(callback: CallbackQuery):
-    """Show options for the chosen filter category."""
-    category = callback.data.split(":")[2]
-    cat_names = {
-        "lake": "🌍 Havza va Ko'llar bo'yicha",
-        "diet": "🥗 Oziqlanish ratsioni bo'yicha",
-        "size": "📏 Baliq o'lchami bo'yicha",
-        "agg": "⚔️ Tajovuzkorlik darajasi bo'yicha",
-        "ph": "🧪 Suv pH darajasi bo'yicha",
-        "iucn": "🛡️ IUCN Qizil Kitob maqomi bo'yicha",
-    }
-    title = cat_names.get(category, "Filtr parametrlari")
-    text = f"⚙️ <b>{title}</b>\n\nKerakli filtr variantini tanlang:"
-    await callback.message.edit_text(text, reply_markup=filter_options_keyboard(category), parse_mode="HTML")
     await callback.answer()
 
 
@@ -115,6 +101,24 @@ async def _execute_filter_search(cat: str, val: str, session) -> list:
         kwargs["conservation_status"] = val
 
     return await search_svc.filter_search(**kwargs)
+
+
+@router.callback_query(F.data.startswith("flt:cat:"))
+async def search_filter_category_options(callback: CallbackQuery):
+    """Show options for the chosen filter category."""
+    category = callback.data.split(":")[2]
+    cat_names = {
+        "lake": "🌍 Havza va Ko'llar bo'yicha",
+        "diet": "🥗 Oziqlanish ratsioni bo'yicha",
+        "size": "📏 Baliq o'lchami bo'yicha",
+        "agg": "⚔️ Tajovuzkorlik darajasi bo'yicha",
+        "ph": "🧪 Suv pH darajasi bo'yicha",
+        "iucn": "🛡️ IUCN Qizil Kitob maqomi bo'yicha",
+    }
+    title = cat_names.get(category, "Filtr parametrlari")
+    text = f"⚙️ <b>{title}</b>\n\nKerakli filtr variantini tanlang:"
+    await callback.message.edit_text(text, reply_markup=filter_options_keyboard(category), parse_mode="HTML")
+    await callback.answer()
 
 
 @router.callback_query(F.data.startswith("flt:do:"))
@@ -181,7 +185,7 @@ async def search_results_paginate(callback: CallbackQuery):
         elif tag.startswith("q_"):
             query = tag[2:]
             search_svc = SearchService(session)
-            results = await search_svc.search(query)
+            results = await search_svc.search_unified(query)
             header_text = (
                 f"🔍 <b>Qidiruv natijalari: {len(results)} ta tur topildi</b>\n"
                 f"<i>\"{query}\" so'rovi bo'yicha (Sahifa: {page}):</i>"
@@ -203,21 +207,14 @@ async def search_results_paginate(callback: CallbackQuery):
     await callback.answer()
 
 
-@router.message(SearchState.waiting_query, F.photo)
-async def process_search_photo_disabled(message: Message, state: FSMContext):
-    """Notify user that search is strictly text-based."""
-    await message.answer(
-        "ℹ️ <b>AquaMasterUzbekistan — qat'iy matnli ilmiy atlasdir.</b>\n\n"
-        "Fotosuratlardan noto'g'ri identifikatsiya qilish xatolarining oldini olish uchun "
-        "qidiruv faqat ilmiy nomlar, sinonimlar, savdo nomlari va lokatsiyalar orqali amalga oshiriladi.\n\n"
-        "Iltimos, baliq nomini matn ko'rinishida yozing:",
-        parse_mode="HTML",
-    )
-
-
 @router.message(SearchState.waiting_query, F.text, ~F.text.startswith("/"))
 async def process_search_text(message: Message, state: FSMContext):
-    """Search fish by text query in local DB and AI."""
+    """Search fish by text query — unified exact, token, and fuzzy matching."""
+    from app.services import FishService
+    from app.utils.formatting import format_standard_reference_card, format_lnumber_reference_card
+    from app.keyboards.profile import profile_tabs_keyboard
+    from app.repositories import LNumberRepository
+
     query = message.text.strip()
     await state.clear()
     user_id = message.from_user.id if message.from_user else 0
@@ -226,79 +223,90 @@ async def process_search_text(message: Message, state: FSMContext):
         user_repo = UserRepository(session)
         await user_repo.log_activity(user_id, "search", query)
         search_svc = SearchService(session)
-        results = await search_svc.search(query)
-        lnum_results = await search_svc.search_lnumbers(query) if not results else []
+        results = await search_svc.search_unified(query)
 
-    if results:
-        paginator = Paginator(results, page=1, per_page=8)
-        kb = search_results_keyboard(paginator.page_items, paginator.page, paginator.total_pages, query=query)
-        await message.answer(
-            f"🔍 <b>Qidiruv natijalari: {len(results)} ta tur topildi</b>\n"
-            f"<i>\"{query}\" so'rovi bo'yicha:</i>",
-            reply_markup=kb,
-            parse_mode="HTML",
-        )
-        return
+        # ── Case 1: Exactly 1 result found -> Direct Dossier with Photo ──
+        if len(results) == 1:
+            item = results[0]
+            if item["type"] == "species":
+                fish_svc = FishService(session)
+                sp = await fish_svc.get_species(item["id"])
+                if sp:
+                    # Check if favorite
+                    db_user = await user_repo.get_by_telegram_id(user_id)
+                    is_fav = await user_repo.is_favorite(db_user.id, sp.id) if db_user else False
+                    if db_user:
+                        await user_repo.add_recently_viewed(db_user.id, sp.id)
 
-    if lnum_results:
+                    genus_name = sp.genus.scientific_name if sp.genus else None
+                    kb = profile_tabs_keyboard(sp.id, is_fav, sp.genus_id, genus_name)
+
+                    # Send verified photo if exists
+                    verified_img = None
+                    if getattr(sp, "images", None) and sp.images:
+                        verified_img = next(
+                            (img for img in sp.images if img.verification.value == "verified" and (img.telegram_file_id or img.image_url)),
+                            sp.images[0]
+                        )
+
+                    card_text = format_standard_reference_card(sp)
+                    if verified_img and (verified_img.telegram_file_id or verified_img.image_url):
+                        photo_target = verified_img.telegram_file_id or verified_img.image_url
+                        caption = (
+                            f"🐠 <b>{sp.scientific_name}</b>\n"
+                            f"📸 <i>Manba: {verified_img.source or 'FishBase / Wikimedia'}</i>"
+                        )
+                        try:
+                            sent_photo = await message.answer_photo(
+                                photo=photo_target,
+                                caption=caption,
+                                parse_mode="HTML"
+                            )
+                            if not verified_img.telegram_file_id and sent_photo.photo:
+                                verified_img.telegram_file_id = sent_photo.photo[-1].file_id
+                                await session.commit()
+                        except Exception:
+                            pass
+                    else:
+                        card_text = "ℹ️ <i>Ishonchli surat: Ushbu tur uchun tasdiqlangan fotosurat hozircha bazada mavjud emas.</i>\n\n" + card_text
+
+                    await safe_answer_html(message, card_text, reply_markup=kb)
+                    return
+
+            elif item["type"] == "lnumber":
+                lnum_repo = LNumberRepository(session)
+                lnum_item = await lnum_repo.get_by_id(item["id"])
+                if lnum_item:
+                    card_text = format_lnumber_reference_card(lnum_item)
+                    builder = InlineKeyboardBuilder()
+                    if lnum_item.species_list:
+                        for s in lnum_item.species_list:
+                            builder.row(InlineKeyboardButton(text=f"🐟 {s.scientific_name} profiliga o'tish", callback_data=f"profile:{s.id}:summary"))
+                    builder.row(InlineKeyboardButton(text="🔎 Yangi qidiruv", callback_data="search"))
+                    builder.row(*back_home_row())
+                    await safe_answer_html(message, card_text, reply_markup=builder.as_markup())
+                    return
+
+        # ── Case 2: Multiple matching results found ──
+        if len(results) > 1:
+            paginator = Paginator(results, page=1, per_page=8)
+            kb = search_results_keyboard(paginator.page_items, paginator.page, paginator.total_pages, query=query)
+            await message.answer(
+                f"🔍 <b>Qidiruv natijalari: {len(results)} ta mos tur topildi</b>\n"
+                f"<i>\"{query}\" so'rovi bo'yicha:</i>",
+                reply_markup=kb,
+                parse_mode="HTML",
+            )
+            return
+
+        # ── Case 3: No results found -> Strict Unverified fallback (NO AI) ──
         builder = InlineKeyboardBuilder()
-        for item in lnum_results:
-            sci = item.scientific_name_current or "Undescribed"
-            builder.row(InlineKeyboardButton(text=f"🔢 {item.designation} — {sci}", callback_data=f"lnum:view:{item.id}"))
-        builder.row(InlineKeyboardButton(text="◀️ Bosh menyu", callback_data="home"))
+        builder.row(InlineKeyboardButton(text="✍️ Taklif qoldirish", callback_data=f"suggest:fish:{query[:30]}"))
+        builder.row(InlineKeyboardButton(text="🔎 Qayta qidirish", callback_data="search"))
+        builder.row(*back_home_row())
+
         await message.answer(
-            f"🔍 <b>L-raqam katalogidan topildi ({len(lnum_results)} ta):</b>\n"
-            f"<i>\"{query}\" so'rovi bo'yicha:</i>",
+            uz.SEARCH_NOT_FOUND_MSG,
             reply_markup=builder.as_markup(),
             parse_mode="HTML",
         )
-        return
-
-    # No local DB results -> Fallback to AI Search automatically
-    wait_msg = await message.answer(
-        f"🔍 <i>\"{query}\" atlas bazasida topilmadi.</i>\n\n"
-        "🤖 <b>AI ilmiy qidiruvi olib bormoqda...</b>\n"
-        "<i>FishBase.org, SeriouslyFish, IUCN, Malawi.si va Tanganyika.si dan to'liq ilmiy ma'lumot izlanmoqda...</i>",
-        parse_mode="HTML",
-    )
-
-    ai_svc = AIService()
-    ai_text = await ai_svc.search_and_explain(query)
-
-    try:
-        await wait_msg.delete()
-    except Exception:
-        pass
-
-    builder = InlineKeyboardBuilder()
-    builder.row(InlineKeyboardButton(text="🔎 Boshqa baliq qidirish", callback_data="search"))
-    builder.row(*back_home_row())
-
-    await safe_answer_html(message, ai_text, reply_markup=builder.as_markup())
-
-
-@router.callback_query(F.data.regexp(r"^ai_search:(.+)$"))
-async def explicit_ai_search(callback: CallbackQuery):
-    """Explicit AI deep dive search requested by user."""
-    query = callback.data.split(":", 1)[1]
-
-    wait_msg = await callback.message.answer(
-        f"🤖 <b>AI chuqur tahlili olib bormoqda: \"{query}\"</b>\n\n"
-        "<i>FishBase.org, SeriouslyFish.com, IUCN, Malawi.si va Tanganyika.si ma'lumotlariga tayanmoqda...</i>",
-        parse_mode="HTML",
-    )
-    await callback.answer()
-
-    ai_svc = AIService()
-    ai_text = await ai_svc.search_and_explain(query)
-
-    try:
-        await wait_msg.delete()
-    except Exception:
-        pass
-
-    builder = InlineKeyboardBuilder()
-    builder.row(InlineKeyboardButton(text="🔎 Yangi qidiruv", callback_data="search"))
-    builder.row(*back_home_row())
-
-    await safe_answer_html(callback.message, ai_text, reply_markup=builder.as_markup())

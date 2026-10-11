@@ -417,31 +417,143 @@ async def article_detail(callback: CallbackQuery):
     await callback.answer()
 
 
-# ── Dictionary ──────────────────────────────────────────────────────
+# ── Dictionary (Glossary) ──────────────────────────────────────────
 dictionary_router = Router(name="dictionary")
 
 
+class DictSearchState(StatesGroup):
+    waiting_query = State()
+
+
 @dictionary_router.callback_query(F.data == "dictionary")
-async def dictionary_menu(callback: CallbackQuery):
+async def dictionary_menu(callback: CallbackQuery, state: FSMContext | None = None):
+    if state:
+        await state.clear()
+    await _show_dict_paged(callback.message, page=1, edit=True)
+    await callback.answer()
+
+
+@dictionary_router.message(F.text == "/glossary")
+async def cmd_dictionary(message: Message, state: FSMContext | None = None):
+    if state:
+        await state.clear()
+    await _show_dict_paged(message, page=1, edit=False)
+
+
+async def _show_dict_paged(message_obj, page: int = 1, edit: bool = False):
     async with async_session() as session:
         from app.repositories.search_repo import DictionaryRepository
         dict_repo = DictionaryRepository(session)
         terms = await dict_repo.get_all_sorted()
 
     from app.utils.pagination import Paginator
-    paginator = Paginator(terms, page=1, per_page=10)
-    items = [(f"📖 {t.term}", str(t.id)) for t in paginator.page_items]
-    kb = build_list_keyboard(items, "dict_term", paginator.page, paginator.total_pages)
+    paginator = Paginator(terms, page=page, per_page=8)
 
-    await callback.message.edit_text(
-        uz.DICTIONARY_TITLE,
-        reply_markup=kb,
-        parse_mode="HTML",
+    builder = InlineKeyboardBuilder()
+    builder.row(InlineKeyboardButton(text="🔎 Atama bo'yicha qidirish", callback_data="dict:search"))
+
+    for t in paginator.page_items:
+        builder.row(InlineKeyboardButton(text=f"📖 {t.term}", callback_data=f"dict_term:{t.id}"))
+
+    # Pagination row
+    if paginator.total_pages > 1:
+        nav = []
+        if page > 1:
+            nav.append(InlineKeyboardButton(text=uz.NAV_PREV, callback_data=f"dict:page:{page - 1}"))
+        nav.append(InlineKeyboardButton(text=f"📄 {page}/{paginator.total_pages}", callback_data="noop"))
+        if page < paginator.total_pages:
+            nav.append(InlineKeyboardButton(text=uz.NAV_NEXT, callback_data=f"dict:page:{page + 1}"))
+        builder.row(*nav)
+
+    builder.row(*back_home_row())
+
+    text = (
+        f"{uz.DICTIONARY_TITLE}\n\n"
+        f"<i>Katalogdagi jami atamalar: {len(terms)} ta</i>\n\n"
+        "Batafsil ma'lumot olish uchun atamani tanlang yoki qidiruvdan foydalaning:"
     )
+
+    if edit and hasattr(message_obj, "edit_text"):
+        await message_obj.edit_text(text, reply_markup=builder.as_markup(), parse_mode="HTML")
+    else:
+        await message_obj.answer(text, reply_markup=builder.as_markup(), parse_mode="HTML")
+
+
+@dictionary_router.callback_query(F.data.startswith("dict:page:"))
+async def dictionary_page(callback: CallbackQuery):
+    page = int(callback.data.split(":")[2])
+    await _show_dict_paged(callback.message, page=page, edit=True)
     await callback.answer()
 
 
-@dictionary_router.callback_query(F.data.regexp(r"^dict_term:(\d+)$"))
+@dictionary_router.callback_query(F.data == "dict:search")
+async def dictionary_search_prompt(callback: CallbackQuery, state: FSMContext):
+    await state.set_state(DictSearchState.waiting_query)
+    builder = InlineKeyboardBuilder()
+    builder.row(InlineKeyboardButton(text="◀️ Lug'at ro'yxatiga qaytish", callback_data="dictionary"))
+    builder.row(*back_home_row())
+
+    text = (
+        "🔎 <b>ATAMA BO'YICHA QIDIRISH</b>\n\n"
+        "Qidirilayotgan so'z yoki atamani yozing:\n"
+        "• <i>F0, F1, Pure line, Gibrid, OB, MC, Albino</i>\n"
+        "• <i>Mbuna, Hap, Utaka, Peacock, Locality</i>\n"
+        "• <i>L-number, pH, GH, KH, Ammiak, Nitrit</i>\n"
+        "• <i>Karantin, Inkubatsiya, Fry, Juvenile</i>"
+    )
+    await callback.message.edit_text(text, reply_markup=builder.as_markup(), parse_mode="HTML")
+    await callback.answer()
+
+
+@dictionary_router.message(DictSearchState.waiting_query, F.text, ~F.text.startswith("/"))
+async def dictionary_search_process(message: Message, state: FSMContext):
+    q = message.text.strip().lower()
+    await state.clear()
+
+    async with async_session() as session:
+        from app.repositories.search_repo import DictionaryRepository
+        dict_repo = DictionaryRepository(session)
+        terms = await dict_repo.get_all_sorted()
+
+    # Match exact or substring or rapidfuzz
+    matches = [t for t in terms if q in t.term.lower() or (t.definition_uz and q in t.definition_uz.lower())]
+
+    builder = InlineKeyboardBuilder()
+    if len(matches) == 1:
+        term = matches[0]
+        text = f"📖 <b>{term.term}</b>\n\n{term.definition_uz}"
+        if term.definition_en:
+            text += f"\n\n🇬🇧 <i>{term.definition_en}</i>"
+        builder.row(InlineKeyboardButton(text="🔎 Yangi atama qidirish", callback_data="dict:search"))
+        builder.row(InlineKeyboardButton(text="◀️ Barcha atamalar", callback_data="dictionary"))
+        builder.row(*back_home_row())
+        await message.answer(text, reply_markup=builder.as_markup(), parse_mode="HTML")
+        return
+
+    if len(matches) > 1:
+        for t in matches[:8]:
+            builder.row(InlineKeyboardButton(text=f"📖 {t.term}", callback_data=f"dict_term:{t.id}"))
+        builder.row(InlineKeyboardButton(text="🔎 Boshqa atama qidirish", callback_data="dict:search"))
+        builder.row(InlineKeyboardButton(text="◀️ Barcha atamalar", callback_data="dictionary"))
+        builder.row(*back_home_row())
+        await message.answer(
+            f"🔍 <b>\"{q}\" so'rovi bo'yicha {len(matches)} ta atama topildi:</b>",
+            reply_markup=builder.as_markup(),
+            parse_mode="HTML"
+        )
+        return
+
+    builder.row(InlineKeyboardButton(text="🔄 Qayta qidirish", callback_data="dict:search"))
+    builder.row(InlineKeyboardButton(text="◀️ Barcha atamalar", callback_data="dictionary"))
+    builder.row(*back_home_row())
+    await message.answer(
+        f"ℹ️ <i>\"{q}\" bo'yicha atama topilmadi. Ro'yxatdan tanlashingiz mumkin:</i>",
+        reply_markup=builder.as_markup(),
+        parse_mode="HTML"
+    )
+
+
+@dictionary_router.callback_query(F.data.startswith("dict_term:"))
 async def dictionary_term_detail(callback: CallbackQuery):
     term_id = int(callback.data.split(":")[1])
     async with async_session() as session:
@@ -455,11 +567,11 @@ async def dictionary_term_detail(callback: CallbackQuery):
 
     text = f"📖 <b>{term.term}</b>\n\n{term.definition_uz}"
     if term.definition_en:
-        text += f"\n\n🇬🇧 {term.definition_en}"
+        text += f"\n\n🇬🇧 <i>{term.definition_en}</i>"
 
-    from aiogram.utils.keyboard import InlineKeyboardBuilder
-    from aiogram.types import InlineKeyboardButton
     builder = InlineKeyboardBuilder()
+    builder.row(InlineKeyboardButton(text="🔎 Atama qidirish", callback_data="dict:search"))
+    builder.row(InlineKeyboardButton(text="◀️ Lug'at ro'yxatiga qaytish", callback_data="dictionary"))
     builder.row(*back_home_row())
 
     await callback.message.edit_text(text, reply_markup=builder.as_markup(), parse_mode="HTML")
@@ -470,21 +582,10 @@ async def dictionary_term_detail(callback: CallbackQuery):
 about_router = Router(name="about")
 
 
-@about_router.callback_query(F.data == "about")
+@about_router.callback_query(F.data.in_(["about", "about_suggest"]))
 async def about_page(callback: CallbackQuery):
-    from aiogram.utils.keyboard import InlineKeyboardBuilder
-    from aiogram.types import InlineKeyboardButton
-    builder = InlineKeyboardBuilder()
-    builder.row(InlineKeyboardButton(text=uz.MENU_FAVORITES, callback_data="favorites"))
-    builder.row(InlineKeyboardButton(text=uz.MENU_RECENT, callback_data="recent"))
-    builder.row(*back_home_row())
-
-    await callback.message.edit_text(
-        uz.ABOUT_TEXT,
-        reply_markup=builder.as_markup(),
-        parse_mode="HTML",
-    )
-    await callback.answer()
+    from app.handlers.about_suggest import about_suggest_menu
+    await about_suggest_menu(callback)
 
 
 # ── Favorites ───────────────────────────────────────────────────────

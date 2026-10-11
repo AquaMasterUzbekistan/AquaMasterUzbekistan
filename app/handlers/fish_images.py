@@ -227,11 +227,13 @@ async def send_verified_fish_images(
 
 @router.callback_query(F.data == "search_images")
 async def handle_search_images_entry(callback: CallbackQuery, state: FSMContext):
-    """Handle clicking '🔎 Baliq suratlarini qidirish' in the main menu."""
-    await state.set_state(FishImageSearchState.waiting_query)
+    """Handle legacy clicking '🔎 Baliq suratlarini qidirish' — redirect to unified search."""
+    from app.handlers.search import SearchState
+    from app.keyboards.search import search_main_keyboard
+    await state.set_state(SearchState.waiting_query)
     await callback.message.edit_text(
-        uz.IMG_SEARCH_PROMPT,
-        reply_markup=image_search_back_keyboard(),
+        uz.SEARCH_PROMPT_MSG,
+        reply_markup=search_main_keyboard(),
         parse_mode="HTML",
     )
     await callback.answer()
@@ -239,11 +241,13 @@ async def handle_search_images_entry(callback: CallbackQuery, state: FSMContext)
 
 @router.message(Command("images"))
 async def handle_cmd_images(message: Message, state: FSMContext):
-    """Handle /images command directly."""
-    await state.set_state(FishImageSearchState.waiting_query)
+    """Handle /images command directly — redirect to unified search."""
+    from app.handlers.search import SearchState
+    from app.keyboards.search import search_main_keyboard
+    await state.set_state(SearchState.waiting_query)
     await message.answer(
-        uz.IMG_SEARCH_PROMPT,
-        reply_markup=image_search_back_keyboard(),
+        uz.SEARCH_PROMPT_MSG,
+        reply_markup=search_main_keyboard(),
         parse_mode="HTML",
     )
 
@@ -277,7 +281,6 @@ async def process_fish_image_query(message: Message, state: FSMContext):
     waiting_msg = await message.answer(uz.IMG_SEARCH_WAITING, parse_mode="HTML")
 
     try:
-        ai_service = AIService()
         async with async_session() as session:
             from app.repositories import UserRepository
             user_repo = UserRepository(session)
@@ -285,24 +288,20 @@ async def process_fish_image_query(message: Message, state: FSMContext):
             result = await FishImageSearchService.search_fish_images(
                 query=raw_query,
                 session=session,
-                ai_service=ai_service,
+                ai_service=None,
                 max_images=8,
                 user_id=user_id,
             )
 
         # Case 1: Unverified or No verified images found
         if not result or result.confidence == MatchConfidence.UNVERIFIED or not result.images:
-            reason_msg = (
-                f"❌ <b>Baliq turi tasdiqlanmadi</b>\n\n"
-                f"Kiritilgan «<b>{html.escape(raw_query)}</b>» nomiga mos ishonchli suratlar topilmadi.\n\n"
-                f"🛡️ <i>Sizga noto'g'ri yoki boshqa baliq turlari suratlari aralashib ketmasligi uchun "
-                f"tasdiqlanmagan suratlar yuborilmadi.</i>\n\n"
-                f"💡 <b>Tavsiya:</b> Baliqning aniq ilmiy nomini, avlodini yoki to'liq yozilishini kiritib qayta urinib ko'ring "
-                f"(masalan: <code>Petrochromis</code>, <code>Aulonocara jacobfreibergi</code>, <code>L333</code>)."
-            )
+            builder = InlineKeyboardBuilder()
+            builder.row(InlineKeyboardButton(text="✍️ Taklif qoldirish", callback_data=f"suggest:fish:{raw_query[:30]}"))
+            builder.row(InlineKeyboardButton(text="🔎 Qayta qidirish", callback_data="search"))
+            builder.row(InlineKeyboardButton(text="🏠 Bosh menyu", callback_data="home"))
             await waiting_msg.edit_text(
-                reason_msg,
-                reply_markup=image_search_followup_keyboard(has_more=False, is_query_mode=True),
+                uz.SEARCH_NOT_FOUND_MSG,
+                reply_markup=builder.as_markup(),
                 parse_mode="HTML",
             )
             return
@@ -318,19 +317,19 @@ async def process_fish_image_query(message: Message, state: FSMContext):
             target_message=message,
             result=result,
             user_id=user_id,
-            species_id=None,
             is_query_mode=True,
         )
-
     except Exception as e:
-        logger.error("Error handling fish image search for '%s': %s", raw_query, e, exc_info=True)
-        try:
-            await waiting_msg.edit_text(
-                "⚠️ Suratlar qidirishda kutilmagan xatolik yuz berdi. Iltimos, keyinroq qayta urinib ko'ring.",
-                reply_markup=image_search_followup_keyboard(has_more=False),
-            )
-        except Exception:
-            pass
+        logger.error(f"Image search query failed: {e}", exc_info=True)
+        builder = InlineKeyboardBuilder()
+        builder.row(InlineKeyboardButton(text="✍️ Taklif qoldirish", callback_data=f"suggest:fish:{raw_query[:30]}"))
+        builder.row(InlineKeyboardButton(text="🔎 Qayta qidirish", callback_data="search"))
+        builder.row(InlineKeyboardButton(text="🏠 Bosh menyu", callback_data="home"))
+        await waiting_msg.edit_text(
+            uz.SEARCH_NOT_FOUND_MSG,
+            reply_markup=builder.as_markup(),
+            parse_mode="HTML",
+        )
     finally:
         _active_user_requests.discard(user_id)
 
