@@ -156,6 +156,24 @@ def create_dispatcher() -> Dispatcher:
     return dp
 
 
+async def start_health_server(port: int):
+    """Start minimal HTTP server for Render/Cloud health checks on free plan."""
+    from aiohttp import web
+    app = web.Application()
+
+    async def ping_handler(request):
+        return web.Response(text="AquaMasterUzbekistan Bot is running healthy 24/7!")
+
+    app.router.add_get("/", ping_handler)
+    app.router.add_get("/health", ping_handler)
+
+    runner = web.AppRunner(app)
+    await runner.setup()
+    site = web.TCPSite(runner, "0.0.0.0", port)
+    await site.start()
+    return runner
+
+
 async def main() -> None:
     """Application main runner."""
     if not settings.BOT_TOKEN or settings.BOT_TOKEN == "your_telegram_bot_token_here":
@@ -165,6 +183,17 @@ async def main() -> None:
         print("\n[!] ERROR: BOT_TOKEN is missing or using placeholder.", file=sys.stderr)
         print("Please configure BOT_TOKEN in your .env file before running.\n", file=sys.stderr)
         sys.exit(1)
+
+    # Start cloud health check server if PORT is provided by environment (e.g. Render Free Tier)
+    port_env = os.getenv("PORT")
+    health_runner = None
+    if port_env and port_env.isdigit():
+        port = int(port_env)
+        try:
+            health_runner = await start_health_server(port)
+            logger.info("Cloud health check HTTP server started on port %d", port)
+        except Exception as e:
+            logger.warning("Could not start health check HTTP server: %s", e)
 
     from aiogram.client.session.aiohttp import AiohttpSession
 
@@ -187,6 +216,8 @@ async def main() -> None:
             polling_timeout=15,
         )
     finally:
+        if health_runner:
+            await health_runner.cleanup()
         await bot.session.close()
 
 
