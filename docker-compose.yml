@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  bot:
+    build: .
+    container_name: aquamaster_bot
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - ./app.db:/app/app.db
+      - ./logs:/app/logs
+      - ./media:/app/media
+    environment:
+      - TZ=Asia/Tashkent
+
+  # Agar kelgusida PostgreSQL ishlatmoqchi bo'lsangiz:
+  # postgres:
+  #   image: postgres:16-alpine
+  #   container_name: aquamaster_postgres
+  #   restart: unless-stopped
+  #   environment:
+  #     POSTGRES_USER: aquamaster
+  #     POSTGRES_PASSWORD: secret_password_here
+  #     POSTGRES_DB: aquamaster_db
+  #   volumes:
+  #     - pgdata:/var/lib/postgresql/data

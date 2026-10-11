@@ -1,0 +1,74 @@
+📊 <b>AQUAMASTERUZBEKISTAN — TO'LIQLIK VA TAKSONOMIYA AUDITI DASHBOARDI</b>
+📅 <i>Audit hisoboti sanasi: 2026-10-11 03:41:13</i>
+
+🏛 <b>Umumiy Taksonomik va Ma'lumot Ko'rsatkichlari:</b>
+• <b>Biologik oilalar (Family):</b> 20
+• <b>Biologik jinslar (Genus):</b> 134
+• <b>Jami hujjatlashtirilgan turlar:</b> 105
+• <b>Qabul qilingan ilmiy turlar (Valid species):</b> 105
+• <b>L-number / LDA-number yozuvlari:</b> 40
+• <b>Xalq nomlari (UZ / EN / RU):</b> 873
+• <b>Tarixiy sinonimlar:</b> 142
+• <b>Akvarium savdo nomlari (Trade names):</b> 329
+• <b>Hujjatlashtirilgan lokatsiyalar (Localities):</b> 127
+• <b>Tasdiqlangan ilmiy faktlar (Claims):</b> 490 🟢
+• <b>Bog'langan manbalar:</b> 258
+
+📈 <b>Profillar Holati va To'liqligi:</b>
+• <b>To'liq ilmiy profillar (A-I bo'limlar):</b> 101 (96.2%)
+• <b>Manbalar bilan tasdiqlangan profillar:</b> 104
+• <b>Biologik ma'lumoti yetarli bo'lmagan:</b> 0
+• <b>Gidrokimyo/parvarish ma'lumoti yetarli bo'lmagan:</b> 0
+• <b>Hujjatlashtirilgan taksonomik bahslar/izohlar:</b> 96
+
+🐟 <b>Guruhlar Bo'yicha Alohida To'liqlik Statistikasi:</b>
+• <b>Lake Malawi:</b> 13 tur | To'liq: 13 (100.0%) | Manbalar: 13
+• <b>Lake Tanganyika:</b> 3 tur | To'liq: 3 (100.0%) | Manbalar: 3
+• <b>Lake Victoria & Other Africa:</b> 6 tur | To'liq: 6 (100.0%) | Manbalar: 6
+• <b>American Cichlids:</b> 60 tur | To'liq: 56 (93.3%) | Manbalar: 60
+• <b>Discus:</b> 4 tur | To'liq: 4 (100.0%) | Manbalar: 4
+• <b>Other Freshwater:</b> 19 tur | To'liq: 19 (100.0%) | Manbalar: 18
+
+🌊 <b>Asosiy Ko'llar va Havzalar:</b>
+• <b>Malavi ko'li (Nyasa):</b> 31 tur | 18 jins
+• <b>Tanganika ko'li:</b> 8 tur | 7 jins
+• <b>Viktoriya ko'li:</b> 6 tur | 5 jins
+• <b>Amazonka havzasi:</b> 22 tur | 16 jins
+• <b>Orinoko havzasi:</b> 4 tur | 4 jins
+• <b>Chao Phraya daryosi:</b> 4 tur | 4 jins
+• <b>Tanganyika ko'li:</b> 20 tur | 11 jins
+• <b>Daryo biotopi:</b> 7 tur | 7 jins
+• <b>Markaziy Amerika:</b> 5 tur | 5 jins
+• <b>Shimoliy Amerika:</b> 2 tur | 1 jins
+• <b>Parana havzasi:</b> 1 tur | 1 jins
+• <b>Indoneziya:</b> 2 tur | 2 jins
+• <b>Hindiston:</b> 1 tur | 1 jins
+• <b>Tailand:</b> 1 tur | 1 jins
+• <b>Malayziya:</b> 2 tur | 2 jins
+• <b>Karib havzasi:</b> 1 tur | 1 jins
+• <b>Sharqiy Osiyo:</b> 1 tur | 1 jins
+• <b>Viktoriya ko'li havzasi:</b> 1 tur | 1 jins
+• <b>Tinch okeani daryolari:</b> 1 tur | 1 jins
+• <b>Markaziy Amerika daryolari:</b> 2 tur | 2 jins
+• <b>Nikaragua ko'llari:</b> 1 tur | 1 jins
+
+🏆 <b>Asosiy Jinslar (Genera) Bo'yicha Qamrov:</b>
+• <i>Aulonocara</i> (Cichlidae): <b>9</b> tur | To'liq: 5
+• <i>Neolamprologus</i> (Cichlidae): <b>7</b> tur | To'liq: 7
+• <i>Symphysodon</i> (Cichlidae): <b>4</b> tur | To'liq: 4
+• <i>Corydoras</i> (Callichthyidae): <b>3</b> tur | To'liq: 3
+• <i>Julidochromis</i> (Cichlidae): <b>3</b> tur | To'liq: 3
+• <i>Pseudotropheus</i> (Cichlidae): <b>3</b> tur | To'liq: 3
+• <i>Altolamprologus</i> (Cichlidae): <b>2</b> tur | To'liq: 2
+• <i>Chindongo</i> (Cichlidae): <b>2</b> tur | To'liq: 2
+
+📚 <b>Avtoritativ Ma'lumot Manbalari (Reference Lists):</b>
+• FishBase.org (Global Ichthyology Database, verified 2026-10)
+• Eschmeyer's Catalog of Fishes (California Academy of Sciences)
+• Malawi.si (Lake Malawi Scientific Guide)
+• Tanganyika.si (Lake Tanganyika Scientific Guide)
+• SeriouslyFish.com (Aquarium Husbandry & Ecology)
+• IUCN Red List of Threatened Species
+
+⚠️ <b>Cheklovlar va Izoh:</b>
+<i>Ushbu audit faqat tekshirilgan va manbaga ega taksonomik birliklarni hisobga oladi. Yangi tasvirlangan turlar va sinonimik o'zgarishlar muntazam kiritiladi.</i>

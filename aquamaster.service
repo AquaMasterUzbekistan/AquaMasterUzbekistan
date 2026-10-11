@@ -1,0 +1,18 @@
+[Unit]
+Description=AquaMasterUzbekistan Telegram Bot Daemon
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/AquaMasterUzbekistan
+ExecStart=/opt/AquaMasterUzbekistan/.venv/bin/python main.py
+Restart=always
+RestartSec=5
+StandardOutput=append:/opt/AquaMasterUzbekistan/logs/bot.log
+StandardError=append:/opt/AquaMasterUzbekistan/logs/bot.log
+Environment="PYTHONUNBUFFERED=1"
+Environment="TZ=Asia/Tashkent"
+
+[Install]
+WantedBy=multi-user.target
