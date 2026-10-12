@@ -124,9 +124,15 @@ async def on_startup(bot: Bot) -> None:
     """Bot startup hook."""
     logger.info("Starting AquaMasterUzbekistan Fish Atlas Bot...")
     await init_database()
-    await set_bot_commands(bot)
-    bot_info = await bot.get_me()
-    logger.info(f"Bot connected: @{bot_info.username} (ID: {bot_info.id})")
+    try:
+        await set_bot_commands(bot)
+    except Exception as e:
+        logger.warning(f"Failed to register bot commands: {e}")
+    try:
+        bot_info = await bot.get_me()
+        logger.info(f"Bot connected: @{bot_info.username} (ID: {bot_info.id})")
+    except Exception as e:
+        logger.warning(f"Failed to fetch bot info on startup: {e}")
 
 
 async def on_shutdown(bot: Bot) -> None:
@@ -234,7 +240,10 @@ async def main() -> None:
     finally:
         if health_runner:
             await health_runner.cleanup()
-        await bot.session.close()
+        try:
+            await asyncio.wait_for(bot.session.close(), timeout=5.0)
+        except Exception:
+            pass
 
 
 if __name__ == "__main__":

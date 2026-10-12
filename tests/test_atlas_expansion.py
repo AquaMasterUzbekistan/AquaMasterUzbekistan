@@ -38,7 +38,7 @@ def test_main_menu_5_panels():
         "📚 Akvarium bilimlari",
         "🧮 Akvarium kalkulyatorlari",
         "📖 Atamalar lug‘ati",
-        "ℹ️ Bot haqida va taklif yuborish",
+        "ℹ️ Bot haqida ma'lumot",
     ]
 
     for expected in expected_texts:

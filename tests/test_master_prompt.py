@@ -22,7 +22,7 @@ def test_master_prompt_5_panels():
         ("📚 Akvarium bilimlari", "knowledge_articles"),
         ("🧮 Akvarium kalkulyatorlari", "calculators"),
         ("📖 Atamalar lug‘ati", "dictionary"),
-        ("ℹ️ Bot haqida va taklif yuborish", "about_suggest"),
+        ("ℹ️ Bot haqida ma'lumot", "about_suggest"),
     ]
 
     for text, cb in expected_panels:

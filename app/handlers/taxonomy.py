@@ -407,14 +407,17 @@ async def author_attribution_page(callback: CallbackQuery):
             pass
 
     builder = InlineKeyboardBuilder()
+    builder.row(InlineKeyboardButton(text="💬 @shoazizoff ga yozish", url="https://t.me/shoazizoff"))
     builder.row(*back_home_row())
 
     text = (
         "🏷️ <b>Muallif: @shoazizoff</b>\n\n"
         "👨‍💻 <b>Loyiha yaratuvchisi va ishlab chiquvchisi:</b>\n"
-        "Ushbu loyiha <b>shoazizoff</b> tomonidan ishlab chiqilidi.\n\n"
-        "📢 <b>Telegram kanal va bog'lanish:</b>\n"
-        "• Profil: @shoazizoff\n"
+        "Ushbu loyiha <b>@shoazizoff</b> tomonidan ishlab chiqildi.\n\n"
+        "📢 <b>Bog'lanish, talab va takliflar:</b>\n"
+        "Barcha talab va takliflar, yangi turlar yoki hamkorlik bo'yicha to'g'ridan-to'g'ri "
+        "<b>@shoazizoff</b> ga murojaat qilishingiz mumkin!\n\n"
+        "• Telegram: @shoazizoff\n"
         "• Loyiha: <b>AquaMasterUzbekistan Fish Atlas</b>\n\n"
         "🇺🇿 <i>AquaMasterUzbekistan — O'zbekiston akvariumchilari uchun to'liq ilmiy va ishonchli elektron qo'llanmadir.</i>"
     )

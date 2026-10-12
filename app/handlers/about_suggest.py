@@ -21,43 +21,74 @@ class SuggestionState(StatesGroup):
     waiting_text = State()
 
 
-@router.callback_query(F.data.in_(["about_suggest", "about"]))
+ABOUT_TEXT = (
+    "ℹ️ <b>BOT HAQIDA MA'LUMOT</b>\n\n"
+    "🐠 <b>AquaMasterUzbekistan Atlas</b> — akvarium baliqlari bo'yicha "
+    "professional, ilmiy asoslangan va doimiy yangilanib boruvchi elektron ensiklopediya.\n\n"
+    "👨‍💻 <b>Loyiha muallifi va ishlab chiquvchisi:</b> @shoazizoff\n"
+    "Ushbu bot akvarium ixlosmandlari uchun <b>@shoazizoff</b> tomonidan ishlab chiqilgan.\n\n"
+    "📩 <b>Talab va takliflar:</b>\n"
+    "Agarda sizda biron-bir talab, taklif, yangi baliq turlarini qo'shish yoki "
+    "savollar bo'lsa, to'g'ridan-to'g'ri <b>@shoazizoff</b> ga murojaat qilishingiz mumkin!\n\n"
+    "━━━━━━━━━━━━━━━━━━━━\n"
+    "🌐 <b>BALIQLARGA OID RASMIY SAYTLAR VA TO'LIQ IP MANZILLARI:</b>\n\n"
+    "1. 🇲🇼 <b>Malawi Cichlids Database</b>\n"
+    "• Sayt: <a href=\"https://malawi.si\">malawi.si</a>\n"
+    "• IP manzil: <code>193.243.141.75</code>\n"
+    "• Yo'nalish: Malavi ko'li turlari, tabiiy biotoplari, variatsiyalari va GPS lokatsiyalari.\n\n"
+    "2. 🇹🇿 <b>Tanganyika Cichlids Database</b>\n"
+    "• Sayt: <a href=\"https://tanganyika.si\">tanganyika.si</a>\n"
+    "• IP manzil: <code>193.243.141.75</code>\n"
+    "• Yo'nalish: Tanganika ko'li sixlidlari taksonomiyasi va morfologik shakllari.\n\n"
+    "3. 🌍 <b>FishBase (Dunyo baliqlari ensiklopediyasi)</b>\n"
+    "• Sayt: <a href=\"https://www.fishbase.se\">fishbase.se</a> | <a href=\"https://www.fishbase.org\">fishbase.org</a>\n"
+    "• IP manzil: <code>193.10.57.58</code> / <code>104.21.21.57</code>\n"
+    "• Yo'nalish: 34,000+ dan ziyod baliqlar taksonomiyasi, biologiyasi va ko'rsatkichlari.\n\n"
+    "4. 🔬 <b>Seriously Fish</b>\n"
+    "• Sayt: <a href=\"https://www.seriouslyfish.com\">seriouslyfish.com</a>\n"
+    "• IP manzil: <code>188.114.97.11</code>\n"
+    "• Yo'nalish: Akvarium sharoitlari, harorat, pH, GH, parvarish va moslik tahlili.\n\n"
+    "5. 🐱 <b>Planet Catfish</b>\n"
+    "• Sayt: <a href=\"https://www.planetcatfish.com\">planetcatfish.com</a>\n"
+    "• IP manzil: <code>172.67.70.147</code>\n"
+    "• Yo'nalish: L-raqamlar (Loricariidae), Corydoras va dunyo laqqasimonlari.\n\n"
+    "6. 📚 <b>Cichlid Room Companion (CRC)</b>\n"
+    "• Sayt: <a href=\"https://www.cichlidae.com\">cichlidae.com</a>\n"
+    "• IP manzil: <code>104.26.3.49</code>\n"
+    "• Yo'nalish: Xalqaro sixlidologlar ilmiy maqolalari, fotosuratlari va biotoplari.\n\n"
+    "7. 🐈 <b>ScotCat Catfish Reference</b>\n"
+    "• Sayt: <a href=\"https://www.scotcat.com\">scotcat.com</a>\n"
+    "• IP manzil: <code>208.113.159.23</code>\n"
+    "• Yo'nalish: Zirhli va noan'anaviy chuchuk suv laqqalari ma'lumotnomasi.\n\n"
+    "8. 🏛️ <b>Eschmeyer's Catalog of Fishes (CAS)</b>\n"
+    "• Sayt: <a href=\"https://researcharchive.calacademy.org\">researcharchive.calacademy.org</a>\n"
+    "• IP manzil: <code>192.40.158.77</code>\n"
+    "• Yo'nalish: Kaliforniya Fanlar Akademiyasi ilmiy nomlar va sinonimlar reyestri."
+)
+
+
+def get_about_keyboard() -> InlineKeyboardBuilder:
+    builder = InlineKeyboardBuilder()
+    builder.row(
+        InlineKeyboardButton(text="💬 @shoazizoff ga yozish", url="https://t.me/shoazizoff"),
+        InlineKeyboardButton(text="✍️ Taklif qoldirish", callback_data="suggest:start"),
+    )
+    builder.row(
+        InlineKeyboardButton(text="📊 Baza qamrovi", callback_data="database_coverage"),
+        InlineKeyboardButton(text="⭐ Saqlanganlar", callback_data="favorites"),
+    )
+    builder.row(*back_home_row())
+    return builder
+
+
+@router.callback_query(F.data.in_(["about_suggest", "about", "about_info"]))
 async def about_suggest_menu(callback: CallbackQuery, state: FSMContext | None = None):
     """Show the About & Suggestion panel."""
     if state:
         await state.clear()
 
-    text = (
-        "ℹ️ <b>BOT HAQIDA VA TAKLIF YUBORISH</b>\n\n"
-        "🐠 <b>AquaMasterUzbekistan Atlas</b> — akvarium baliqlari bo'yicha "
-        "professional, ilmiy asoslangan va doimiy rivojlanuvchi elektron ma'lumotnoma tizimidir.\n\n"
-        "🎯 <b>Asosiy maqsad:</b>\n"
-        "Akvarium ixlosmandlariga har bir turning to'g'ri fotosurati, aniq ilmiy tasnifi, "
-        "tabiiy biotopi, suv parametrlari va to'g'ri parvarish bo'yicha ishonchli bilimlarni taqdim etish.\n\n"
-        "📚 <b>Ilmiy manbalar:</b>\n"
-        "• <b>FishBase.org</b> — baliqlar biologiyasi va taksonomiyasi\n"
-        "• <b>Eschmeyer's Catalog of Fishes</b> — ilmiy nomlar va sinonimlar\n"
-        "• <b>Malawi.si & Tanganyika.si</b> — Afrika ko'l cichlidlari va biotoplari\n"
-        "• <b>SeriouslyFish.com</b> — akvarium sharoiti va gidrokimyoviy parvarish\n"
-        "• <b>DATZ / PlanetCatfish</b> — L-raqamlar va zirhli laqqalar\n\n"
-        "🏷️ <b>Muallif va ishlab chiquvchi:</b> @shoazizoff\n"
-        "📦 <b>Versiya:</b> 2.0 (Master Edition)\n\n"
-        "Fikrlaringiz, yangi turlar yoki tuzatishlar bo'yicha takliflaringizni mamnuniyat bilan qabul qilamiz!"
-    )
-
-    builder = InlineKeyboardBuilder()
-    builder.row(InlineKeyboardButton(text="✍️ Yangi tur yoki tuzatish taklif qilish", callback_data="suggest:start"))
-    builder.row(
-        InlineKeyboardButton(text="📊 Baza qamrovi", callback_data="database_coverage"),
-        InlineKeyboardButton(text="ℹ️ Manbalar tafsiloti", callback_data="sources_info"),
-    )
-    builder.row(
-        InlineKeyboardButton(text="⭐ Saqlanganlar", callback_data="favorites"),
-        InlineKeyboardButton(text="🕘 So'nggi ko'rilganlar", callback_data="recent"),
-    )
-    builder.row(*back_home_row())
-
-    await callback.message.edit_text(text, reply_markup=builder.as_markup(), parse_mode="HTML")
+    builder = get_about_keyboard()
+    await callback.message.edit_text(ABOUT_TEXT, reply_markup=builder.as_markup(), parse_mode="HTML")
     await callback.answer()
 
 
@@ -67,17 +98,8 @@ async def cmd_about(message: Message, state: FSMContext | None = None):
     if state:
         await state.clear()
 
-    builder = InlineKeyboardBuilder()
-    builder.row(InlineKeyboardButton(text="✍️ Taklif yoki yangi tur yuborish", callback_data="suggest:start"))
-    builder.row(*back_home_row())
-
-    text = (
-        "ℹ️ <b>AquaMasterUzbekistan Atlas</b>\n\n"
-        "Akvarium ixlosmandlari uchun zamonaviy elektron ensiklopediya.\n"
-        "Muallif: @shoazizoff\n\n"
-        "Taklif qoldirish uchun quyidagi tugmani bosing:"
-    )
-    await message.answer(text, reply_markup=builder.as_markup(), parse_mode="HTML")
+    builder = get_about_keyboard()
+    await message.answer(ABOUT_TEXT, reply_markup=builder.as_markup(), parse_mode="HTML")
 
 
 @router.callback_query(F.data == "suggest:start")
